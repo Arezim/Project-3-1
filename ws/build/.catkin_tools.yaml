@@ -1,0 +1,6 @@
+devel_space: /root/ws/devel
+install: false
+install_space: /root/ws/install
+profile: default
+source_space: /root/ws/src
+workspace: /root/ws
