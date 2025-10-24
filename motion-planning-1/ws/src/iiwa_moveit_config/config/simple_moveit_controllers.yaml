@@ -1,0 +1,13 @@
+controller_list:
+  - name: manipulator_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: True
+    joints:
+      - m_robot_joint_1
+      - m_robot_joint_2
+      - m_robot_joint_3
+      - m_robot_joint_4
+      - m_robot_joint_5
+      - m_robot_joint_6
+      - m_robot_joint_7

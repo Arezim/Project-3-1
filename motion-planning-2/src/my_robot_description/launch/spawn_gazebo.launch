@@ -1,0 +1,23 @@
+<launch>
+  <!-- 1) Make sure Gazebo uses ROS time -->
+  <param name="use_sim_time" value="true"/>
+
+  <!-- 2) Put your URDF onto the ROS parameter server -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro '$(find my_robot_description)/urdf/MRobot_Gazebo.urdf'"/>
+
+  <!-- 3) Start Gazebo (empty world is fine) -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+  </include>
+
+  <!-- 4) Spawn the robot from the 'robot_description' param -->
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_mrobot"
+        args="-urdf -param robot_description -model m_robot" output="screen"/>
+
+  <!-- 5) Publish TF from your URDF -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="rsp"/>
+</launch>

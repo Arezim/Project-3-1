@@ -1,0 +1,2 @@
+configuration:iiwa_description:my_robot_description
+-DCATKIN_DEVEL_PREFIX=/home/tom/ws_urdf/devel -DCMAKE_INSTALL_PREFIX=/home/tom/ws_urdf/install -G Unix Makefiles
