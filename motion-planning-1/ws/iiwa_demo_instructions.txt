@@ -1,0 +1,74 @@
+KUKA iiwa Motion Planning & Obstacle Avoidance - Quick Setup Guide
+
+This explains how to run everything from scratch inside the Docker setup.
+
+1) SETUP THE WORKSPACE
+
+Start your Docker container (use the same one you used before).
+Then inside the container:
+
+mkdir -p /root/ws/src
+cd /root/ws
+catkin init
+catkin config --extend /opt/ros/noetic
+
+Copy these three folders into /root/ws/src:
+    iiwa_description/
+    iiwa_moveit_config/
+    iiwa_dynamic_demo/
+
+Then make scripts executable:
+
+cd /root/ws/src/iiwa_dynamic_demo/scripts
+chmod +x *.py
+
+Build the workspace:
+
+cd /root/ws
+catkin build
+source devel/setup.bash
+
+
+2) START MOVEIT + RVIZ
+
+Open a first terminal (inside Docker) and run:
+
+roslaunch iiwa_moveit_config demo.launch
+
+RViz should open with the KUKA arm showing.
+
+
+3) RUN THE DEMOS
+
+Open a second terminal (keep the first one running) and run:
+
+source /root/ws/devel/setup.bash
+cd /root/ws
+
+--- Basic motion demo ---
+rosrun iiwa_dynamic_demo a_to_b_demo.py
+
+The arm will move from upright to flat (horizontal) and back.
+
+--- Static obstacle demo ---
+rosrun iiwa_dynamic_demo a_to_b_with_obstacle.py
+
+This spawns a green cube on the path. The arm moves around it.
+
+You can move the cube by changing its position, example:
+
+rosrun iiwa_dynamic_demo a_to_b_with_obstacle.py _blocker_dx:=-0.1 _blocker_dy:=0.3 _blocker_dz:=0.15
+
+(dx = red arrow, dy = green arrow, dz = blue arrow)
+
+--- Dynamic obstacle demo ---
+rosrun iiwa_dynamic_demo a_to_b_dynamic_obstacle.py
+
+This one spawns the cube dynamically halfway through the motion.
+
+
+4) TROUBLESHOOTING
+
+If you see START_STATE_IN_COLLISION -> restart RViz and try again.
+If you see TIMED_OUT -> increase planning time in the script.
+If cube spawns in robot -> tweak _blocker_dy or dz as shown above.
