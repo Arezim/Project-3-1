@@ -1,0 +1,8 @@
+prefix=/root/ws/devel/.private/iiwa_dynamic_demo
+
+Name: iiwa_dynamic_demo
+Description: Description of iiwa_dynamic_demo
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

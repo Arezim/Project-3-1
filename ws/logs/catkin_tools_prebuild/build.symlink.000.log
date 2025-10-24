@@ -1,0 +1,13 @@
+Symlinking /root/ws/devel/./local_setup.bash
+Symlinking /root/ws/devel/./setup.sh
+Symlinking /root/ws/devel/./setup.zsh
+Symlinking /root/ws/devel/./_setup_util.py
+Symlinking /root/ws/devel/./setup.bash
+Symlinking /root/ws/devel/./env.sh
+Symlinking /root/ws/devel/./local_setup.fish
+Symlinking /root/ws/devel/./local_setup.zsh
+Symlinking /root/ws/devel/./local_setup.sh
+Symlinking /root/ws/devel/./setup.fish
+Symlinking /root/ws/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig.cmake
+Symlinking /root/ws/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig-version.cmake
+Symlinking /root/ws/devel/lib/pkgconfig/catkin_tools_prebuild.pc

@@ -1,0 +1,4 @@
+iiwa_moveit_config
+/root/ws/devel/.private/iiwa_moveit_config/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig-version.cmake /root/ws/devel/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig-version.cmake
+/root/ws/devel/.private/iiwa_moveit_config/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig.cmake /root/ws/devel/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig.cmake
+/root/ws/devel/.private/iiwa_moveit_config/lib/pkgconfig/iiwa_moveit_config.pc /root/ws/devel/lib/pkgconfig/iiwa_moveit_config.pc
