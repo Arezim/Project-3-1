@@ -1,0 +1,23 @@
+services:
+  noetic:
+    image: osrf/ros:noetic-desktop-full
+    container_name: ros-noetic
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/tmp/.docker.xauth
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - MESA_GL_VERSION_OVERRIDE=3.3
+      # Use software rendering by default (good for VMs like VirtualBox).
+      - LIBGL_ALWAYS_SOFTWARE=${LIBGL_ALWAYS_SOFTWARE:-1}
+      - MESA_GL_VERSION_OVERRIDE=${MESA_GL_VERSION_OVERRIDE:-3.3}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - ./ws:/root/ws:rw          # your catkin workspace
+      - ./gazebo:/root/.gazebo:rw # persist models/worlds (optional)
+      - ${HOME}/.docker.xauth:/tmp/.docker.xauth:rw
+    network_mode: host
+    command: ["sleep","infinity"]   # keep container up; we'll exec in
+    restart: unless-stopped
+

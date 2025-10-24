@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: iiwa_description
+    relative_path: urdf/iiwa14.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/m_robot.srdf
+  CONFIG:
+    author_name: Andreescu
+    author_email: andreescu004@gmail.com
+    generated_timestamp: 1761320752
