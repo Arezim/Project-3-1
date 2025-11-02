@@ -222,18 +222,25 @@ class MoveGroupPythonInterfaceTutorial(object):
         ## We can plan a motion for this group to a desired pose for the
         ## end-effector:
         pose_goal = geometry_msgs.msg.Pose()
-        pose_goal.orientation.w = goal_position[0]
+        # pose_goal.orientation.w = goal_position[0]
         pose_goal.position.x = goal_position[1]
         pose_goal.position.y = goal_position[2]
         pose_goal.position.z = goal_position[3]
 
+        move_group.set_planning_time(4)
+        move_group.set_goal_tolerance(0.1)
         move_group.set_pose_target(pose_goal)
+        self.add_box(goal_position[1], goal_position[2], goal_position[3])
+        # success, plan, planning_time, error_code = move_group.plan()
+
 
         ## Now, we call the planner to compute the plan and execute it.
         # `go()` returns a boolean indicating whether the planning and execution was successful.
         success = move_group.go(wait=True)
+        # move_group.execute(plan, wait=True)
         # Calling `stop()` ensures that there is no residual movement
         move_group.stop()
+        
         # It is always good to clear your targets after planning with poses.
         # Note: there is no equivalent function for clear_joint_value_targets().
         move_group.clear_pose_targets()
@@ -377,7 +384,7 @@ class MoveGroupPythonInterfaceTutorial(object):
         return False
         ## END_SUB_TUTORIAL
 
-    def add_box(self, timeout=4):
+    def add_box(self, x, y, z, timeout=4):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
         # reason not to.
@@ -392,7 +399,10 @@ class MoveGroupPythonInterfaceTutorial(object):
         box_pose = geometry_msgs.msg.PoseStamped()
         box_pose.header.frame_id = self.move_group.get_planning_frame()
         box_pose.pose.orientation.w = 1.0
-        box_pose.pose.position.z = 0.11  # above the panda_hand frame
+        box_pose.pose.position.x = x
+        box_pose.pose.position.y = y
+        box_pose.pose.position.z = z
+
         box_name = "box"
         scene.add_box(box_name, box_pose, size=(0.075, 0.075, 0.075))
 
