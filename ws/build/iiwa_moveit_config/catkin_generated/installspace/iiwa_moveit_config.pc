@@ -1,4 +1,4 @@
-prefix=/root/ws/install
+prefix=/root/dyn_ws/install
 
 Name: iiwa_moveit_config
 Description: Description of iiwa_moveit_config

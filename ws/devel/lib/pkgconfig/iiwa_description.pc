@@ -1,1 +1,8 @@
-/root/ws/devel/.private/iiwa_description/lib/pkgconfig/iiwa_description.pc
+prefix=/root/dyn_ws/devel
+
+Name: iiwa_description
+Description: Description of iiwa_description
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

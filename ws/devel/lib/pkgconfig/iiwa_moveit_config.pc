@@ -1,1 +1,8 @@
-/root/ws/devel/.private/iiwa_moveit_config/lib/pkgconfig/iiwa_moveit_config.pc
+prefix=/root/dyn_ws/devel
+
+Name: iiwa_moveit_config
+Description: Description of iiwa_moveit_config
+Version: 0.3.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

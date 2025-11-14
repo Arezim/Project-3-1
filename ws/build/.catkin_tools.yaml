@@ -1,6 +1,6 @@
-devel_space: /root/ws/devel
+devel_space: /root/dyn_ws/devel
 install: false
-install_space: /root/ws/install
+install_space: /root/dyn_ws/install
 profile: default
-source_space: /root/ws/src
-workspace: /root/ws
+source_space: /root/dyn_ws/src
+workspace: /root/dyn_ws

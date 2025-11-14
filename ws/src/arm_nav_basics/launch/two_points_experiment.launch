@@ -1,0 +1,56 @@
+<launch>
+  <node pkg="arm_nav_basics" type="marker_points.py" name="marker_points" output="screen" />
+
+  <node pkg="arm_nav_basics" type="dynamic_obstacle.py" name="dynamic_obstacle" output="screen">
+    <!-- Circle around roughly the robot base -->
+    <param name="motion_type" value="circle"/>
+
+
+    <!-- Center of the circle (tune to where your arm base actually is) -->
+    <param name="center_x" value="0.0"/>
+    <param name="center_y" value="0.0"/>
+    <param name="z"        value="1.10"/>  <!-- height of the box -->
+
+    <!-- Radius + speed -->
+    <param name="radius" value="0.45"/>
+    <param name="angular_speed" value="0.75"/>  <!-- rad/s -->
+
+    <!-- Size of the obstacle (use rosparam so it's a list) -->
+    <rosparam param="size">[0.2, 0.5, 1.10]</rosparam>
+
+    <!-- Optional: slight vertical bobbing while circling -->
+    <param name="z_wave_amp" value="0.0"/>
+    <param name="z_wave_freq" value="0.3"/>
+
+    <!-- Update rate -->
+    <param name="update_rate" value="10.0"/>
+  </node>
+
+  <node pkg="arm_nav_basics" type="experiment_runner.py" name="experiment_runner" output="screen">
+    <!-- This list is in the exact order you wanted -->
+    <rosparam param="planner_ids">
+      [
+        "RRTConnectkConfigDefault",   # RRTCONNECT
+        "RRTstarkConfigDefault",      # RRTSTAR
+        "PRMkConfigDefault",          # PRM
+        "PRMstarkConfigDefault",      # PRMSTAR
+        "BKPIECEkConfigDefault",      # BKPIECE
+        "LBKPIECEkConfigDefault",     # LBKPIECE
+        "BiTRRTkConfigDefault",       # BITRRT (BiTRRT)
+        "ABITstarkConfigDefault",     # ABITSTAR
+        "SPARSkConfigDefault",        # SPARS
+        "STRIDEkConfigDefault",       # STRIDE
+        "BFMTkConfigDefault"          # BFMT
+      ]
+    </rosparam>
+
+    <!-- how many attempts per planner (across all targets) -->
+    <param name="max_trials" value="15"/>
+
+    <!-- where to log -->
+    <param name="csv_path" value="/root/dyn_ws/interp_experiment_allplanners.csv"/>
+
+    <!-- optional: slower/faster looping -->
+    <param name="loop_rate_hz" value="0.05"/>
+  </node>
+</launch>

@@ -7,7 +7,4 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/root/ws/devel/.private/iiwa_description:$CMAKE_PREFIX_PATH"
-export PWD='/root/ws/build/iiwa_description'
-export ROSLISP_PACKAGE_DIRECTORIES="/root/ws/devel/.private/iiwa_description/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/root/ws/src/iiwa_description:$ROS_PACKAGE_PATH"
+export PWD='/root/dyn_ws/build/iiwa_description'

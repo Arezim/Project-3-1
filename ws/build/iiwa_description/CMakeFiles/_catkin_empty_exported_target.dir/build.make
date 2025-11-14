@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/ws/src/iiwa_description
+CMAKE_SOURCE_DIR = /root/dyn_ws/src/iiwa_description
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/ws/build/iiwa_description
+CMAKE_BINARY_DIR = /root/dyn_ws/build/iiwa_description
 
 # Utility rule file for _catkin_empty_exported_target.
 
@@ -67,6 +67,6 @@ CMakeFiles/_catkin_empty_exported_target.dir/clean:
 .PHONY : CMakeFiles/_catkin_empty_exported_target.dir/clean
 
 CMakeFiles/_catkin_empty_exported_target.dir/depend:
-	cd /root/ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/ws/src/iiwa_description /root/ws/src/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description/CMakeFiles/_catkin_empty_exported_target.dir/DependInfo.cmake --color=$(COLOR)
+	cd /root/dyn_ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/dyn_ws/src/iiwa_description /root/dyn_ws/src/iiwa_description /root/dyn_ws/build/iiwa_description /root/dyn_ws/build/iiwa_description /root/dyn_ws/build/iiwa_description/CMakeFiles/_catkin_empty_exported_target.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/_catkin_empty_exported_target.dir/depend
 

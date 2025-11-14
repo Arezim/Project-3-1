@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/ws/src/iiwa_description
+CMAKE_SOURCE_DIR = /root/dyn_ws/src/iiwa_description
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/ws/build/iiwa_description
+CMAKE_BINARY_DIR = /root/dyn_ws/build/iiwa_description
 
 # Utility rule file for tests.
 
@@ -67,6 +67,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /root/ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/ws/src/iiwa_description /root/ws/src/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /root/dyn_ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/dyn_ws/src/iiwa_description /root/dyn_ws/src/iiwa_description /root/dyn_ws/build/iiwa_description /root/dyn_ws/build/iiwa_description /root/dyn_ws/build/iiwa_description/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 

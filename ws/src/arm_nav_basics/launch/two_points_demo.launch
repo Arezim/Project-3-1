@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="arm_nav_basics" type="marker_points.py" name="marker_points" output="screen" />
+  <node pkg="arm_nav_basics" type="move_to_points.py" name="move_to_points" output="screen" />
+  <!-- <node pkg="arm_nav_basics" type="static_obstacle.py" name="static_obstacle" output="screen" /> -->
+  <node pkg="arm_nav_basics" type="dynamic_obstacle.py" name="dynamic_obstacle" output="screen" />
+  <node pkg="arm_nav_basics" type="experiment_runner.py" name="experiment_runner" output="screen" />
+</launch>
