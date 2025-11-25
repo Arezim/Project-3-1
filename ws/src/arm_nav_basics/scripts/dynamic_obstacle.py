@@ -32,7 +32,7 @@ def update_obstacle(event):
     pose.header.frame_id = frame
     pose.header.stamp = rospy.Time.now()
 
-    # ----- motion modes -----
+    # how the obstacle moves
     if motion_type == "circle":
         # circular motion in the XY-plane around (center_x, center_y)
         theta = angular_speed * t + phase
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         parts = [p for p in parts if p != ""]
         raw_size = parts
 
-    # If raw_size is a list of strings or numbers, coerce to floats safely.
+    # if raw_size is a list of strings or numbers, coerce to floats safely.
     try:
         size = [float(raw_size[0]), float(raw_size[1]), float(raw_size[2])]
     except (IndexError, ValueError, TypeError) as e:
@@ -103,12 +103,11 @@ if __name__ == "__main__":
     base_y = float(rospy.get_param("~y", -0.60))
     base_z = float(rospy.get_param("~z", 1.25))
 
-    # ---- linear motion params (old behavior) ----
+    # linear motion params
     amplitude = float(rospy.get_param("~amplitude", 0.10))   # meters
     frequency = float(rospy.get_param("~frequency", 0.2))    # Hz
     axis = rospy.get_param("~axis", "y")                     # "x", "y", or "z" / moves on this axis
 
-    # ---- circular motion params ----
     motion_type = rospy.get_param("~motion_type", "linear")  # "linear" or "circle"
 
     # circle in XY-plane around (center_x, center_y)

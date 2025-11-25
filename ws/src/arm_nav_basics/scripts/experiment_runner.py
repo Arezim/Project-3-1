@@ -1,64 +1,76 @@
 #!/usr/bin/env python3
 import os
 import csv
-import math
-import rospy
 import time
-from copy import deepcopy
-from geometry_msgs.msg import PoseStamped
-from moveit_commander import MoveGroupCommander, roscpp_initialize
+import math
 
-# ---------- helpers ----------
+import rospy
+import moveit_commander
+from geometry_msgs.msg import PoseStamped
+from moveit_msgs.msg import RobotTrajectory
+from trajectory_msgs.msg import JointTrajectory
 
 def make_pose(x, y, z, frame="base_link"):
-    p = PoseStamped()
-    p.header.frame_id = frame
-    p.pose.position.x = x
-    p.pose.position.y = y
-    p.pose.position.z = z
-    p.pose.orientation.w = 1.0
-    return p
-
-def interpolate_pose(start, target, alpha):
-    """
-    alpha = 1.0 -> target, alpha = 0.0 -> start
-    (same convention as your move_to_points_v1)
-    """
     pose = PoseStamped()
-    pose.header.frame_id = start.header.frame_id
-    pose.pose.orientation = deepcopy(target.pose.orientation)
-
-    pose.pose.position.x = start.pose.position.x * (1 - alpha) + target.pose.position.x * alpha
-    pose.pose.position.y = start.pose.position.y * (1 - alpha) + target.pose.position.y * alpha
-    pose.pose.position.z = start.pose.position.z * (1 - alpha) + target.pose.position.z * alpha
+    pose.header.frame_id = frame
+    pose.pose.orientation.w = 1.0
+    pose.pose.position.x = x
+    pose.pose.position.y = y
+    pose.pose.position.z = z
     return pose
 
-def try_plan(group, pose):
-    group.set_start_state_to_current_state()
-    group.set_pose_target(pose)
 
-    start_wall = time.time()
-    plan = group.plan()
-    planning_time = time.time() - start_wall
+def distance(pose_a, pose_b):
+    dx = pose_a.position.x - pose_b.position.x
+    dy = pose_a.position.y - pose_b.position.y
+    dz = pose_a.position.z - pose_b.position.z
+    return math.sqrt(dx * dx + dy * dy + dz * dz)
 
-    # MoveIt Noetic can return:
-    #  - RobotTrajectory
-    #  - (success_flag, RobotTrajectory)
-    if isinstance(plan, tuple):
-        success_flag = bool(plan[0])
-        plan_obj = plan[1] if len(plan) > 1 else None
-    else:
-        plan_obj = plan
-        success_flag = bool(
-            plan_obj
-            and getattr(plan_obj, "joint_trajectory", None)
-            and plan_obj.joint_trajectory.points
-        )
 
-    group.clear_pose_targets()
-    return success_flag, plan_obj, planning_time
+def extract_plan(plan_result):
+    """Handle both MoveIt return styles and give (success, RobotTrajectory)."""
+    if isinstance(plan_result, tuple):
+        success_flag = bool(plan_result[0])
+        traj = None
+        for item in plan_result:
+            if isinstance(item, RobotTrajectory):
+                traj = item
+                break
+        return success_flag and traj is not None, traj
 
-def _ensure_csv_path(csv_path):
+    traj = plan_result
+    success_flag = bool(
+        traj
+        and getattr(traj, "joint_trajectory", None)
+        and traj.joint_trajectory.points
+    )
+    return success_flag, traj
+
+
+def slice_trajectory(traj, max_time):
+    """Return a new RobotTrajectory truncated to max_time seconds."""
+    jt = traj.joint_trajectory
+    if not jt.points:
+        return traj
+
+    total_duration = jt.points[-1].time_from_start.to_sec()
+    if max_time >= total_duration:
+        return traj
+
+    sliced_points = [
+        pt for pt in jt.points if pt.time_from_start.to_sec() <= max_time + 1e-6
+    ]
+    if not sliced_points:
+        sliced_points = [jt.points[0]]
+
+    new_traj = RobotTrajectory()
+    new_traj.joint_trajectory = JointTrajectory()
+    new_traj.joint_trajectory.joint_names = list(jt.joint_names)
+    new_traj.joint_trajectory.points = sliced_points
+    return new_traj
+
+
+def ensure_csv_path(csv_path):
     parent = os.path.dirname(csv_path)
     if not parent:
         return csv_path
@@ -66,271 +78,283 @@ def _ensure_csv_path(csv_path):
         os.makedirs(parent, exist_ok=True)
         return csv_path
     except Exception as e:
-        fallback = "/tmp/interp_experiment.csv"
-        rospy.logwarn("experiment_runner: cannot create %s (%s), falling back to %s",
-                      parent, str(e), fallback)
+        fallback = "/tmp/dyn_replanner_log.csv"
+        rospy.logwarn(
+            "replanner_experiment: cannot create %s (%s), falling back to %s",
+            parent,
+            str(e),
+            fallback,
+        )
         return fallback
 
-# ---------- main experiment ----------
-
 def main():
-    rospy.init_node("experiment_runner", anonymous=False)
-    roscpp_initialize([])
+    rospy.init_node("replanner_experiment", anonymous=False)
+    moveit_commander.roscpp_initialize([])
 
-    # single-planner fallback param (for compatibility)
+    group_name     = rospy.get_param("~group_name", "manipulator")
+    frame_id       = rospy.get_param("~frame_id", "base_link")
+    slice_sec      = float(rospy.get_param("~slice_sec", 1.4))
+    goal_tolerance = float(rospy.get_param("~goal_tolerance", 0.03))
+    vel_scale      = float(rospy.get_param("~vel_scale", 0.25))
+    acc_scale      = float(rospy.get_param("~acc_scale", 0.25))
+
+    # planner list and how many goal reaches per planner
     default_planner = rospy.get_param("~planner_id", "RRTConnectkConfigDefault")
-    # list of planners to test, in order
     planner_ids = rospy.get_param("~planner_ids", [default_planner])
+    episodes_per_planner = int(rospy.get_param("~episodes_per_planner", 4))
 
-    csv_path   = rospy.get_param("~csv_path", "/root/dyn_ws/interp_experiment.csv")
-    loop_rate  = rospy.get_param("~loop_rate_hz", 0.05)   # ~1 cycle / 20s
-    reach_frame = rospy.get_param("~frame_id", "base_link")
-    # IMPORTANT: max_trials = attempts PER PLANNER
-    max_trials = rospy.get_param("~max_trials", 15)
+    csv_path_param = rospy.get_param(
+        "~csv_path",
+        "/root/dyn_ws/temp_csv/dyn_replanner_log.csv",
+    )
+    csv_path = ensure_csv_path(csv_path_param)
 
-    group = MoveGroupCommander("manipulator")
-    group.set_planning_time(10.0)
-    group.set_num_planning_attempts(10)
-    group.set_max_velocity_scaling_factor(0.25)
-    group.set_max_acceleration_scaling_factor(0.25)
+    # targets (same as marker_points)
+    A = rospy.get_param("~target_A", {"x": 0.60, "y": 0.10, "z": 0.95})
+    B = rospy.get_param("~target_B", {"x": -0.60, "y": -0.50, "z": 1.50})
+    targets = [
+        ("A", make_pose(A["x"], A["y"], A["z"], frame=frame_id)),
+        ("B", make_pose(B["x"], B["y"], B["z"], frame=frame_id)),
+    ]
 
-    rospy.loginfo("experiment_runner: planner_ids = %s", ", ".join(planner_ids))
-    rospy.loginfo("experiment_runner: max_trials per planner = %d", max_trials)
+    robot = moveit_commander.RobotCommander()
+    group = moveit_commander.MoveGroupCommander(group_name)
+    group.set_pose_reference_frame(frame_id)
+    group.set_max_velocity_scaling_factor(vel_scale)
+    group.set_max_acceleration_scaling_factor(acc_scale)
+    group.set_planning_time(5.0)
+    group.set_num_planning_attempts(5)
 
-    # ---- target set: easy + spicy but reachable-ish ----
-    targets = {
-        "A": make_pose(0.60,  0.10, 0.95, frame=reach_frame),
-        "B": make_pose(-0.60, -0.50, 1.50, frame=reach_frame),
-        "TOP_DIAG": make_pose(0.45, 0.45, 1.80, frame=reach_frame),
-        "LOW_BACK": make_pose(-0.20, -0.80, 0.65, frame=reach_frame),
-        "SIDE_SWEEP": make_pose(0.80, -0.15, 1.10, frame=reach_frame),
-    }
-    labels = list(targets.keys())
+    planner_index = 0
+    current_planner = planner_ids[planner_index]
+    group.set_planner_id(current_planner)
 
-    # alpha schedule
-    alphas = [1.0, 0.9, 0.8, 0.7, 0.55, 0.4]
+    rospy.loginfo("replanner_experiment: group='%s', frame='%s'", group_name, frame_id)
+    rospy.loginfo(
+        "replanner_experiment: slice_sec=%.3f, goal_tol=%.3f, episodes_per_planner=%d",
+        slice_sec,
+        goal_tolerance,
+        episodes_per_planner,
+    )
+    rospy.loginfo(
+        "replanner_experiment: planners in test: %s",
+        ", ".join(planner_ids),
+    )
+    rospy.loginfo(
+        "replanner_experiment: using first planner '%s'",
+        current_planner,
+    )
+    rospy.loginfo(
+        "replanner_experiment: targets: A=(%.2f, %.2f, %.2f), B=(%.2f, %.2f, %.2f)",
+        A["x"], A["y"], A["z"],
+        B["x"], B["y"], B["z"],
+    )
 
-    # ---------- CSV setup (APPEND if exists) ----------
-    csv_path = _ensure_csv_path(csv_path)
+    # CSV
     file_exists = os.path.exists(csv_path) and os.path.getsize(csv_path) > 0
-
-    mode = "a" if file_exists else "w"
-    f = open(csv_path, mode, newline="")
+    f = open(csv_path, "a" if file_exists else "w", newline="")
     writer = csv.writer(f)
 
     if not file_exists:
-        rospy.loginfo("experiment_runner: creating new CSV with header at %s", csv_path)
+        rospy.loginfo("replanner_experiment: creating new CSV at %s", csv_path)
         writer.writerow([
             "timestamp",
-            "trial_id",
             "planner_id",
+            "planner_index",
+            "episode_id",
+            "episode_in_planner",
+            "slice_index",
+            "from_label",
+            "to_label",
             "target_label",
-            "target_x", "target_y", "target_z",
-            "start_x", "start_y", "start_z",
-
-            "success",                   # 0/1
-            "success_alpha",             # -1 if failure
-            "success_alpha_index",       # index in alphas list, -1 if failure
-
-            "num_alpha_attempts",        # how many alphas we actually tried
-            "num_failed_alphas",         # how many of those failed
-            "num_interpolation_steps",   # attempts - 1 (0 = direct, >0 = interpolated)
-
-            "alphas_tried",              # "1.00;0.90;0.80"
-            "alphas_failed",             # e.g. "1.00;0.90"
-
-            "planning_time_success_s",   # planning time of the successful attempt (0 if none)
-            "planning_time_total_s",     # sum of planning times over all attempts
-
-            "num_traj_points",
-            "traj_duration_s"
+            "episode_time_s",
+            "distance_before",
+            "distance_after",
+            "goal_tolerance",
+            "goal_reached_after_slice",      # 0 or 1
+            "plan_success",                  # 0 or 1
+            "exec_success",                  # 0 or 1
+            "blocked_flag",                  # 1 if planning failed
+            "planning_time_s",
+            "traj_full_duration_s",
+            "slice_duration_s",
+            "num_traj_points_full",
+            "num_traj_points_slice",
+            "blocked_slices_so_far_in_episode",
+            "total_planned_time_so_far_in_episode",
         ])
         f.flush()
-        global_trial_id_start = 0
-    else:
-        rospy.loginfo("experiment_runner: appending to existing CSV %s", csv_path)
-        # infer last trial_id from line count (minus header)
-        try:
-            with open(csv_path, "r") as rf:
-                line_count = sum(1 for _ in rf)
-            global_trial_id_start = max(line_count - 1, 0)
-            rospy.loginfo("experiment_runner: continuing trial_id from %d", global_trial_id_start)
-        except Exception as e:
-            rospy.logwarn("experiment_runner: could not infer trial_id (%s), starting from 0", str(e))
-            global_trial_id_start = 0
 
-    rate = rospy.Rate(loop_rate)
-    global_trial_id = global_trial_id_start
+    rate = rospy.Rate(1.0)
+
+    episode_id = 0
+    episode_in_planner = 0
+    target_index = 0
+    from_label = "START"
+    slice_index = 0
+    episode_start = rospy.Time.now().to_sec()
+    blocked_slices_in_episode = 0
+    total_planned_time_in_episode = 0.0
 
     try:
-        # ===== outer loop over planners =====
-        for planner_id in planner_ids:
-            if rospy.is_shutdown():
-                break
+        while not rospy.is_shutdown():
+            label, goal_pose = targets[target_index]
+            to_label = label
 
-            rospy.loginfo("experiment_runner: === Starting planner %s ===", planner_id)
-            group.set_planner_id(planner_id)
+            robot_state = robot.get_current_state()
+            group.set_start_state(robot_state)
 
-            # per-planner stats in memory (for console)
-            stats = {
-                name: {
-                    "visits": 0,
-                    "direct_success": 0,
-                    "interp_success": 0,
-                    "failures": 0,
-                    "sum_success_alpha": 0.0,
-                }
-                for name in labels
-            }
+            current_pose_stamped = group.get_current_pose()
+            current_pose = current_pose_stamped.pose
+            dist_before = distance(current_pose, goal_pose.pose)
+            episode_time = rospy.Time.now().to_sec() - episode_start
 
-            label_index = 0
-            planner_trial_count = 0  # how many attempts we've done for THIS planner
+            rospy.loginfo(
+                "replanner_experiment: planner=%s ep=%d slice=%d target=[%s] dist_before=%.3f",
+                current_planner,
+                episode_id,
+                slice_index,
+                label,
+                dist_before,
+            )
 
-            while (not rospy.is_shutdown()) and (planner_trial_count < max_trials):
-                label = labels[label_index]
-                target_pose = targets[label]
-                stats[label]["visits"] += 1
+            # planning
+            planning_start = time.time()
+            group.set_pose_target(goal_pose)
+            plan_result = group.plan()
+            planning_time = time.time() - planning_start
+            group.clear_pose_targets()
 
-                # current pose = base for interpolation
-                current_pose = group.get_current_pose().pose
-                start_x = current_pose.position.x
-                start_y = current_pose.position.y
-                start_z = current_pose.position.z
+            plan_success, traj = extract_plan(plan_result)
 
-                # per-trial stats
-                success = False
-                success_alpha = -1.0
-                success_alpha_index = -1
-                planning_time_success = 0.0
-                planning_time_total = 0.0
-                num_pts = 0
-                traj_dur = 0.0
+            exec_success = False
+            dist_after = dist_before
+            full_duration = 0.0
+            slice_duration = 0.0
+            n_full = 0
+            n_slice = 0
 
-                tried_alphas = []
-                failed_alphas = []
+            # if planning succeeded, execute sliced trajectory
+            if plan_success and traj and traj.joint_trajectory.points:
+                jt_full = traj.joint_trajectory
+                n_full = len(jt_full.points)
+                full_duration = jt_full.points[-1].time_from_start.to_sec()
 
-                current_trial_idx = planner_trial_count + 1
-                rospy.loginfo("experiment_runner: ===== [%s] planner=%s (trial %d/%d) =====",
-                              label, planner_id, current_trial_idx, max_trials)
-
-                # try alphas in order
-                for idx, alpha in enumerate(alphas):
-                    tried_alphas.append(alpha)
-
-                    cand = interpolate_pose(
-                        make_pose(start_x, start_y, start_z, frame=reach_frame),
-                        target_pose,
-                        alpha,
-                    )
+                slice_time = min(slice_sec, full_duration)
+                sliced_traj = slice_trajectory(traj, slice_time)
+                jt_slice = sliced_traj.joint_trajectory
+                if jt_slice.points:
+                    n_slice = len(jt_slice.points)
+                    slice_duration = jt_slice.points[-1].time_from_start.to_sec()
 
                     rospy.loginfo(
-                        "experiment_runner: trying %s (planner=%s) with alpha=%.2f (%.0f%% distance)",
-                        label, planner_id, alpha, alpha * 100.0
+                        "replanner_experiment: executing SLICE planner=%s ep=%d slice=%d "
+                        "(slice_dur=%.3f, full_dur=%.3f)",
+                        current_planner,
+                        episode_id,
+                        slice_index,
+                        slice_duration,
+                        full_duration,
                     )
+                    exec_success = group.execute(sliced_traj, wait=True)
 
-                    ok, plan_obj, pt = try_plan(group, cand)
-                    planning_time_total += pt
-
-                    if ok and plan_obj and getattr(plan_obj, "joint_trajectory", None):
-                        pts = plan_obj.joint_trajectory.points
-                        num_pts = len(pts)
-                        if num_pts > 0:
-                            traj_dur = pts[-1].time_from_start.to_sec()
-
-                        success = True
-                        success_alpha = alpha
-                        success_alpha_index = idx
-                        planning_time_success = pt
-
-                        rospy.loginfo("experiment_runner: SUCCESS %s (planner=%s) with alpha=%.2f",
-                                      label, planner_id, alpha)
-                        break
-                    else:
-                        failed_alphas.append(alpha)
-                        rospy.logwarn("experiment_runner: FAIL %s (planner=%s) with alpha=%.2f",
-                                      label, planner_id, alpha)
-
-                num_alpha_attempts = len(tried_alphas)
-                num_failed_alphas = len(failed_alphas)
-                num_interpolation_steps = max(0, num_alpha_attempts - 1)
-
-                # update per-target stats (for console)
-                s = stats[label]
-                if success:
-                    s["sum_success_alpha"] += success_alpha
-                    if success_alpha_index == 0:
-                        s["direct_success"] += 1
-                    else:
-                        s["interp_success"] += 1
+                    if exec_success:
+                        new_pose = group.get_current_pose().pose
+                        dist_after = distance(new_pose, goal_pose.pose)
                 else:
-                    s["failures"] += 1
-                    rospy.logerr("experiment_runner: all alphas failed for target %s (planner=%s)",
-                                 label, planner_id)
-
-                total_success = s["direct_success"] + s["interp_success"]
-                avg_alpha = (s["sum_success_alpha"] / float(total_success)) if total_success > 0 else float("nan")
-                rospy.loginfo(
-                    "experiment_runner: STATS [%s] planner=%s visits=%d direct=%d interp=%d fail=%d avg_alpha=%.2f",
-                    label, planner_id,
-                    s["visits"], s["direct_success"], s["interp_success"], s["failures"], avg_alpha,
+                    rospy.logwarn(
+                        "replanner_experiment: sliced trajectory empty, skipping execution",
+                    )
+            else:
+                rospy.logwarn(
+                    "replanner_experiment: planning failed for target [%s] (ep=%d slice=%d planner=%s)",
+                    label,
+                    episode_id,
+                    slice_index,
+                    current_planner,
                 )
 
-                # write a CSV row for this attempt (global trial index)
-                global_trial_id += 1
-                planner_trial_count += 1
+            blocked_flag = 1 if not plan_success else 0
+            if blocked_flag:
+                blocked_slices_in_episode += 1
+            total_planned_time_in_episode += slice_duration
 
-                writer.writerow([
-                    rospy.Time.now().to_sec(),
-                    global_trial_id,
-                    planner_id,
+            goal_reached_after_slice = 1 if dist_after <= goal_tolerance else 0
+
+            # csv stuff
+            writer.writerow([
+                rospy.Time.now().to_sec(),
+                current_planner,
+                planner_index,
+                episode_id,
+                episode_in_planner,
+                slice_index,
+                from_label,
+                to_label,
+                label,
+                episode_time,
+                dist_before,
+                dist_after,
+                goal_tolerance,
+                goal_reached_after_slice,
+                1 if plan_success else 0,
+                1 if exec_success else 0,
+                blocked_flag,
+                planning_time,
+                full_duration,
+                slice_duration,
+                n_full,
+                n_slice,
+                blocked_slices_in_episode,
+                total_planned_time_in_episode,
+            ])
+            f.flush()
+
+            if goal_reached_after_slice:
+                rospy.loginfo(
+                    "replanner_experiment: planner=%s reached [%s] within tol %.3f, "
+                    "ending episode %d (episode_in_planner=%d)",
+                    current_planner,
                     label,
-                    target_pose.pose.position.x,
-                    target_pose.pose.position.y,
-                    target_pose.pose.position.z,
-                    start_x, start_y, start_z,
+                    goal_tolerance,
+                    episode_id,
+                    episode_in_planner,
+                )
 
-                    1 if success else 0,
-                    success_alpha,
-                    success_alpha_index,
+                from_label = label
+                target_index = (target_index + 1) % len(targets)
 
-                    num_alpha_attempts,
-                    num_failed_alphas,
-                    num_interpolation_steps,
+                episode_id += 1
+                episode_in_planner += 1
+                slice_index = 0
+                episode_start = rospy.Time.now().to_sec()
+                blocked_slices_in_episode = 0
+                total_planned_time_in_episode = 0.0
 
-                    ";".join(f"{a:.2f}" for a in tried_alphas),
-                    ";".join(f"{a:.2f}" for a in failed_alphas),
+                # switch planner after enough episodes for this one
+                if episode_in_planner >= episodes_per_planner:
+                    planner_index = (planner_index + 1) % len(planner_ids)
+                    current_planner = planner_ids[planner_index]
+                    group.set_planner_id(current_planner)
+                    rospy.loginfo(
+                        "replanner_experiment: switching to new planner '%s' (index=%d)",
+                        current_planner,
+                        planner_index,
+                    )
+                    episode_in_planner = 0
+            else:
+                slice_index += 1
 
-                    planning_time_success,
-                    planning_time_total,
-
-                    num_pts,
-                    traj_dur,
-                ])
-                f.flush()
-
-                # after a full sweep over labels, print per-planner summary
-                if label_index == len(labels) - 1:
-                    rospy.loginfo("experiment_runner: ===== PLANNER SUMMARY (planner=%s so far) =====", planner_id)
-                    for name in labels:
-                        s2 = stats[name]
-                        tot2 = s2["direct_success"] + s2["interp_success"]
-                        avg2 = (s2["sum_success_alpha"] / float(tot2)) if tot2 > 0 else float("nan")
-                        rospy.loginfo(
-                            "  [%s] visits=%d direct=%d interp=%d fail=%d avg_alpha=%.2f",
-                            name,
-                            s2["visits"], s2["direct_success"],
-                            s2["interp_success"], s2["failures"], avg2,
-                        )
-
-                # next target (round-robin)
-                label_index = (label_index + 1) % len(labels)
-                rate.sleep()
-
-            rospy.loginfo("experiment_runner: === Finished planner %s ===", planner_id)
+            rate.sleep()
 
     finally:
         f.close()
-        rospy.loginfo("experiment_runner: CSV file closed (%s)", csv_path)
+        rospy.loginfo("replanner_experiment: CSV closed (%s)", csv_path)
+        moveit_commander.roscpp_shutdown()
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
