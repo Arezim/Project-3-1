@@ -1,6 +1,5 @@
 sensors:
   - sensor_plugin: occupancy_map_monitor/DepthImageOctomapUpdater
-    # point_cloud_topic: /cloud_pcd/
     image_topic: /camera/depth/image_rect_raw
     queue_size: 5
     near_clipping_plane_distance: 0.3
