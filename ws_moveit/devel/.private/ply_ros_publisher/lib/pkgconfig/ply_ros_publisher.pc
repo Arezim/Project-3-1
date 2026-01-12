@@ -1,0 +1,8 @@
+prefix=/root/test/ws_moveit/devel/.private/ply_ros_publisher
+
+Name: ply_ros_publisher
+Description: Description of ply_ros_publisher
+Version: 0.0.0
+Cflags: -I/root/test/ws_moveit/src/ply_ros_publisher/include
+Libs: -L${prefix}/lib 
+Requires: 

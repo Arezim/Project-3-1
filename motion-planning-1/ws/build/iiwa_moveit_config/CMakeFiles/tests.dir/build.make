@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/ws/src/iiwa_moveit_config
+CMAKE_SOURCE_DIR = /root/test/motion-planning-1/ws/src/iiwa_moveit_config
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/ws/build/iiwa_moveit_config
+CMAKE_BINARY_DIR = /root/test/motion-planning-1/ws/build/iiwa_moveit_config
 
 # Utility rule file for tests.
 
@@ -67,6 +67,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /root/ws/build/iiwa_moveit_config && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/ws/src/iiwa_moveit_config /root/ws/src/iiwa_moveit_config /root/ws/build/iiwa_moveit_config /root/ws/build/iiwa_moveit_config /root/ws/build/iiwa_moveit_config/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /root/test/motion-planning-1/ws/build/iiwa_moveit_config && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/test/motion-planning-1/ws/src/iiwa_moveit_config /root/test/motion-planning-1/ws/src/iiwa_moveit_config /root/test/motion-planning-1/ws/build/iiwa_moveit_config /root/test/motion-planning-1/ws/build/iiwa_moveit_config /root/test/motion-planning-1/ws/build/iiwa_moveit_config/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 

@@ -1,0 +1,3 @@
+Symlinking /root/test/ws_moveit/devel/lib/pkgconfig/iiwa_control.pc
+Symlinking /root/test/ws_moveit/devel/share/iiwa_control/cmake/iiwa_controlConfig-version.cmake
+Symlinking /root/test/ws_moveit/devel/share/iiwa_control/cmake/iiwa_controlConfig.cmake

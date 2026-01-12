@@ -1,4 +1,4 @@
-prefix=/root/ws/install
+prefix=/root/test/motion-planning-1/ws/install
 
 Name: iiwa_description
 Description: Description of iiwa_description

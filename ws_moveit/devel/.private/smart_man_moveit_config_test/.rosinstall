@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /root/test/ws_moveit/devel/.private/smart_man_moveit_config_test/setup.sh

@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/ws/src/iiwa_description
+CMAKE_SOURCE_DIR = /root/test/motion-planning-1/ws/src/iiwa_description
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/ws/build/iiwa_description
+CMAKE_BINARY_DIR = /root/test/motion-planning-1/ws/build/iiwa_description
 
 # Utility rule file for run_tests.
 
@@ -67,6 +67,6 @@ CMakeFiles/run_tests.dir/clean:
 .PHONY : CMakeFiles/run_tests.dir/clean
 
 CMakeFiles/run_tests.dir/depend:
-	cd /root/ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/ws/src/iiwa_description /root/ws/src/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description /root/ws/build/iiwa_description/CMakeFiles/run_tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /root/test/motion-planning-1/ws/build/iiwa_description && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /root/test/motion-planning-1/ws/src/iiwa_description /root/test/motion-planning-1/ws/src/iiwa_description /root/test/motion-planning-1/ws/build/iiwa_description /root/test/motion-planning-1/ws/build/iiwa_description /root/test/motion-planning-1/ws/build/iiwa_description/CMakeFiles/run_tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/run_tests.dir/depend
 

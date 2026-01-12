@@ -1,0 +1,8 @@
+prefix=/root/test/ws_moveit/install
+
+Name: ply_ros_publisher
+Description: Description of ply_ros_publisher
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

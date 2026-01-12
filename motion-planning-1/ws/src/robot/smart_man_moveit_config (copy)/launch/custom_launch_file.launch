@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Gazebo options -->
+  <arg name="gazebo_gui" default="true" doc="Start Gazebo GUI"/>
+  <arg name="paused" default="false" doc="Start Gazebo paused"/>
+  <arg name="world_name" default="worlds/empty.world" doc="Gazebo world file"/>
+  <arg name="world_pose" default="-x 0 -y 0 -z 0 -R 0 -P 0 -Y 0" doc="Pose to spawn the robot at"/>
+  <arg name="use_rviz" default="true"/>
+  <arg name="debug" default="false"/>
+  <arg name="use_zed" default="false"/>
+  <arg name="use_realsense" default="false"/>
+
+  <!-- Launch Gazebo and spawn the robot -->
+  <include file="$(dirname)/gazebo.launch" pass_all_args="true"/>
+
+  <!-- Launch camera zed camera-->
+  <include file="$(find zed_wrapper)/launch/zed2i.launch" if="$(arg use_zed)">
+    <arg name="camera_name" value="zed2i"/>
+    <arg name="camera_model" value="zed2i"/>
+    <arg name="publish_urdf" value="false"/>
+  </include>
+
+  <!-- Launch realsense camera -->
+  <include file="$(find smart_man_moveit_config)/launch/rs_d435_camera.launch" if="$(arg use_realsense)"/>
+
+  <!-- If needed, broadcast static tf for robot root -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 world base_link" />
+
+  <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+  <include file="$(dirname)/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+    <arg name="moveit_controller_manager" value="ros_control" />
+    <arg name="fake_execution_type" value="interpolate"/>
+    <arg name="info" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="pipeline" value="ompl"/>
+    <arg name="load_robot_description" value="false"/>
+  </include>
+
+  <node pkg="iiwa_moveit_config" name="point_cloud_time_sync.py" type="point_cloud_time_sync.py" if="$(arg use_zed)"/>
+
+  <!-- Run Rviz and load the default config to see the state of the move_group node -->
+  <include file="$(dirname)/moveit_rviz.launch" if="$(arg use_rviz)">
+    <!-- <arg name="rviz_config" value="$(dirname)/moveit.rviz"/> -->
+    <arg name="rviz_config" value="$(dirname)/mtc.rviz"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+</launch>

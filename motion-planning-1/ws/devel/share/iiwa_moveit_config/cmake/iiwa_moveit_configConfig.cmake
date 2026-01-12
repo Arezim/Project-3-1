@@ -1,1 +1,1 @@
-/root/ws/devel/.private/iiwa_moveit_config/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig.cmake
+/root/test/motion-planning-1/ws/devel/.private/iiwa_moveit_config/share/iiwa_moveit_config/cmake/iiwa_moveit_configConfig.cmake

@@ -1,1 +1,1 @@
-/root/ws/devel/.private/catkin_tools_prebuild/local_setup.fish
+/root/test/motion-planning-1/ws/devel/.private/catkin_tools_prebuild/local_setup.fish

@@ -1,1 +1,1 @@
-/root/ws/devel/.private/iiwa_dynamic_demo/share/iiwa_dynamic_demo/cmake/iiwa_dynamic_demoConfig-version.cmake
+/root/test/motion-planning-1/ws/devel/.private/iiwa_dynamic_demo/share/iiwa_dynamic_demo/cmake/iiwa_dynamic_demoConfig-version.cmake

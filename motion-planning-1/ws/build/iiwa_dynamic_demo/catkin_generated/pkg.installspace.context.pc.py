@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "iiwa_dynamic_demo"
-PROJECT_SPACE_DIR = "/root/ws/install"
+PROJECT_SPACE_DIR = "/root/test/motion-planning-1/ws/install"
 PROJECT_VERSION = "0.0.1"

@@ -1,0 +1,3 @@
+water_tray: "corosect_ws/src/corosect/corosect/m_robot_moveit_config/scripts/meshes/Bird_drinker_ICF v5.stl"
+bird_feeder: "corosect_ws/src/corosect/corosect/m_robot_moveit_config/scripts/meshes/BirdFeeder.stl"
+cup: "corosect_ws/src/corosect/corosect/m_robot_moveit_config/scripts/meshes/Cup.stl"

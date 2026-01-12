@@ -1,0 +1,34 @@
+controller_list:
+  - name: joint_trajectory_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - iiwa_joint_1
+      - iiwa_joint_2
+      - iiwa_joint_3
+      - iiwa_joint_4
+      - iiwa_joint_5
+      - iiwa_joint_6
+      - iiwa_joint_7
+  - name: arm_controller
+    action_ns: joint_trajectory_action
+    type: FollowJointTrajectory
+    joints:
+      - iiwa_joint_1
+      - iiwa_joint_2
+      - iiwa_joint_3
+      - iiwa_joint_4
+      - iiwa_joint_5
+      - iiwa_joint_6
+      - iiwa_joint_7
+  - name: gripper_controller
+    action_ns: joint_trajectory_action
+    type: FollowJointTrajectory
+    joints:
+      - rg6_joint_1_1
+      - rg6_joint_1_2
+      - rg6_joint_2_1
+      - rg6_joint_2_2
+initial:  # Define initial robot poses per group
+  - group: arm
+    pose: pose1

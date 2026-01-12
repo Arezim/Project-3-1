@@ -1,0 +1,46 @@
+controller_list:
+  - name: fake_arm_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - m_robot_joint_1
+      - m_robot_joint_2
+      - m_robot_joint_3
+      - m_robot_joint_4
+      - m_robot_joint_5
+      - m_robot_joint_6
+      - m_robot_joint_7
+      - m_robot_linear_drive_guiderail_sledge_joint
+      - m_robot_linear_drive_sledge_dof1_joint
+      - m_robot_linear_drive_dof1_dof2_joint
+  - name: fake_soft_rg6_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - Soft_RG6_joint_1_1
+      - Soft_RG6_joint_1_2
+      - Soft_RG6_joint_2_1
+      - Soft_RG6_joint_2_2
+  - name: fake_arm_guide_rail_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - m_robot_joint_1
+      - m_robot_joint_2
+      - m_robot_joint_3
+      - m_robot_joint_4
+      - m_robot_joint_5
+      - m_robot_joint_6
+      - m_robot_joint_7
+  - name: fake_iiwa_group_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - m_robot_joint_1
+      - m_robot_joint_2
+      - m_robot_joint_3
+      - m_robot_joint_4
+      - m_robot_joint_5
+      - m_robot_joint_6
+      - m_robot_joint_7
+initial:  # Define initial robot poses per group
+  - group: arm
+    pose: default_arm
+  - group: soft_rg6
+    pose: open

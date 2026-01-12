@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- <include file="$(find smart_man_moveit_config_test)/launch/fake_world.launch" /> -->
+
+    <group ns="real_world">
+      <arg name="use_rviz" default="false"/>
+      <arg name="debug" default="false"/>
+      <arg name="use_zed" default="false"/>
+      <arg name="use_realsense" default="false"/>
+      <arg name="moveit_controller_manager" default="simple"/>
+      <arg name="rviz_setup" default="mtc"/>
+
+      <!-- Launch camera zed camera-->
+      <include file="$(find zed_wrapper)/launch/zed2i.launch" if="$(arg use_zed)">
+        <arg name="camera_name" value="zed2i"/>
+        <arg name="camera_model" value="zed2i"/>
+        <arg name="publish_urdf" value="false"/>
+      </include>
+
+      <!-- Launch realsense camera -->
+      <include file="$(find smart_man_moveit_config_test_test)/launch/rs_d435_camera.launch" if="$(arg use_realsense)"/>
+
+      <!-- If needed, broadcast static tf for robot root -->
+      <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 world base_link" />
+
+      <node pkg="corosect_rg6_controller" type="corosct_rg6_controller_node" name="corosct_rg6_controller_node" output="screen" />
+      <node pkg="corosect_heartbeat" name="task_manager_node" type="task_manager_node" output="screen" />
+      <node pkg="corosect_invertapro" name="max_ee_pose_node" type="max_ee_pose_publisher.py" output="screen" /> <!-- TODO move to more suitable package -->
+
+      <!-- <include file="$(dirname)/ros_controllers.launch"/> -->
+      <group if="$(eval arg('moveit_controller_manager') == 'fake')">
+        <!-- We do not have a real robot connected, so publish fake joint states via a joint_state_publisher
+            MoveIt's fake controller's joint states are considered via the 'source_list' parameter -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+          <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+        </node>
+
+        <!-- Given the published joint states, publish tf for the robot links -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+      </group>
+
+      <!-- <include file="$(dirname)/ros_controllers.launch"/> -->
+      <group if="$(eval arg('moveit_controller_manager') == 'simple')">
+        <include file="$(find tres_motores)/launch/controllers.launch" />
+        <!-- We do not have a real robot connected, so publish fake joint states via a joint_state_publisher
+            MoveIt's fake controller's joint states are considered via the 'source_list' parameter -->
+        <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+          <rosparam param="source_list">[/iiwa/joint_states,custom/ee_joint_states,linear_extension/teknic/joint_states,linear_extension/dynamixel/joint_states,
+          rg6_controller/joint_states]</rosparam>
+        </node>
+	-->
+        <!-- Given the published joint states, publish tf for the robot links -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+        <!-- UNCOMMENT TO ENABLE ACTION SERVER AUTO LAUNCH -->
+        <node pkg="smart_man_moveit_config_test" name="ArmControllerFollowJointTrajectoryServer" type="arm_controller_action_server.py"/>
+        <node pkg="smart_man_moveit_config_test" name="SoftRG6ControllerFollowJointTrajectoryServer" type="soft_rg6_controller_action_server.py"/>
+      </group>
+      
+      <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+      <include file="$(find smart_man_moveit_config_test)/launch/move_group.launch">
+        <arg name="allow_trajectory_execution" value="true"/>
+        <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
+        <arg name="fake_execution_type" value="interpolate"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="pipeline" value="ompl"/>
+        <arg name="load_robot_description" value="true"/>
+      </include>
+
+      <!-- Zivid -->
+      <node pkg="corosect_computer_vision" name="zivid_service_node" type="zivid_interface.py" output="screen" />
+      
+      <!--- CERTH -->
+      <!-- <node pkg="corosect_vi" name="certh_visual_inspection" type="VI_ICF.py" output="screen"/> -->
+
+      <!-- NASEKOMO SETUP -->
+      <!-- <node pkg="tf" type="static_transform_publisher" name="zivid_link_workspace_publisher" args="-0.083871925 0.854819946 1.579460327 0.9997161, 0.0166554, 0.0134507, -0.0104595 m_robot_link_0 zivid_workspace_link 10" /> -->
+      <!-- <node pkg="tf" type="static_transform_publisher" name="zivid_link_left_bay_publisher" args="-0.585479248 -0.532185791 1.540773315 0.4146474 0.9094119 0.0234764 -0.0220568 m_robot_link_0 zivid_left_bay_link 10" /> -->
+
+      <!-- ENTOMOTECH -->
+      <node pkg="tf" type="static_transform_publisher" name="zivid_link_workspace_publisher" args="0.83512545 0.06802279 1.5888587 0.71058821 -0.70301628 0.0269654 0.0102642 m_robot_link_0 zivid_workspace_link 10" />
+      <node pkg="tf" type="static_transform_publisher" name="zivid_link_left_bay_publisher" args="-0.49511474 0.6447479 1.5441077 0.95370218 0.29798115 0.04054225 0.00396407 m_robot_link_0 zivid_left_bay_link 10" />
+      <node pkg="tf" type="static_transform_publisher" name="zivid_link_right_bay_publisher" args="-0.31943306 -0.7424262 1.5526924 0.24486435 0.96947686 0.01120296 -0.00552948 m_robot_link_0 zivid_right_bay_link 10" />
+      <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="camera_link_broadcaster"
+      args="-0.0740043 -0.149002 0.0297903 0.056889 0.69482 0.713198 0.073058 m_robot_linear_drive_link_ee rs_aruco_camera" /> -->
+      <node pkg="corosect_invertapro" name="weighing_service_node" type="weighing_service.py" />
+      <node pkg="corosect_invertapro" name="stack_manager_node" type="stack_manager.py" />
+
+      <!-- Aruco Detection -->
+      <rosparam>
+        /real_world/realsense/rgb_camera/enable_auto_exposure: true
+        <!-- /real_world/realsense/rgb_camera/exposure: 4000 -->
+        /real_world/realsense/rgb_camera/gain: 0
+        /real_world/realsense/rgb_camera/contrast: 50
+        /real_world/realsense/rgb_camera/brigtness: 50
+        /real_world/realsense/rgb_camera/sharpness: 0
+        /real_world/realsense/rgb_camera/enable_auto_white_balance: true
+        <!-- /real_world/realsense/rgb_camera/white_balance: 6500 -->
+      </rosparam>
+      <include file="$(find smart_man_moveit_config_test)/launch/rs_d435_camera.launch" />
+      <node pkg='smart_man_moveit_config_test' name='correct_aruco_detect_tf_node' type='correct_aruco_tf.py' output='screen' />
+      <node pkg="aruco_detect" name="aruco_detect_node" type="aruco_detect" output="screen">
+        <param name="dictionary" value="0" />
+        <param name="fiducial_len" value="0.0395" />
+        <param name="publish_images" value="true" />
+      </node> 
+      <node pkg="topic_tools" type="relay" name="relay_realsense_aruco_camera_node" args="/real_world/realsense/color/image_raw /real_world/camera" />
+      <node pkg="topic_tools" type="relay" name="relay_realsense_aruco_camera_info_node" args="/real_world/realsense/color/camera_info /real_world/camera_info" />
+
+      <!-- <node pkg="smart_man_moveit_config_test" name="point_cloud_time_sync" type="point_cloud_time_sync.py" if="$(arg use_zed)"/> -->
+
+      <!-- Run Rviz and load the default config to see the state of the move_group node -->
+      <include file="$(find smart_man_moveit_config_test)/launch/moveit_rviz.launch" if="$(arg use_rviz)">
+        <!-- <arg name="rviz_config" value="$(dirname)/moveit.rviz"/> -->
+        <arg name="rviz_config" value="$(dirname)/$(arg rviz_setup).rviz"/>
+        <arg name="debug" value="$(arg debug)"/>
+      </include>
+
+      <!-- Joint Activity --> 
+      <node pkg="smart_man_moveit_config_test" type='joint_activity_publisher.py' name='joint_activity_publisher_node' />
+
+    </group>
+
+    <!-- Database -->
+    <!-- <arg name="moveit_warehouse_host" default="/home/moveit2/corosect_ws/src/corosect/corosect/smart_man_moveit_config_test/database/database.sqlite" />
+    <arg name="moveit_warehouse_port" default="0" />
+    <param name="warehouse_plugin" value="warehouse_ros_sqlite::DatabaseConnection" />
+
+    <node name="$(anon mongo_wrapper_ros)" cwd="ROS_HOME" type="mongo_wrapper_ros.py" pkg="warehouse_ros_mongo">
+      <param name="overwrite" value="false"/>
+      <param name="database_path" value="$(arg moveit_warehouse_host)" />
+    </node> -->
+
+</launch>

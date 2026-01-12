@@ -1,0 +1,10 @@
+# roslaunch moveit_planners_ompl generate_state_database.launch constraints_file:=$(rospack find m_robot_moveit_config)/config/constraints.yaml planning_group:=arm
+# copy database from .ros to our workspace
+name: linear_drive_guiderail_constraint
+constraints: 
+  - type: orientation
+    frame_id: base_link
+    link_name: m_robot_linear_drive_link_ee
+    orientation: [0., 0., 0.]
+    tolerances: [0.001, 0.001, 0.001]
+    weight: 1

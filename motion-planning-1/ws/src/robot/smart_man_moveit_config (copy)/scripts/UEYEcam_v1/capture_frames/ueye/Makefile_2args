@@ -1,0 +1,20 @@
+CC=g++
+FLAGS=-g -pedantic -Wall -Wextra -Wno-error
+COMPILE=$(CC) $(FLAGS)
+UEYE_INCLUDE=/opt/ids/ueye/include
+OBJECTS=obj/main.o obj/ueye_camera.o obj/console.o
+
+runnable:$(OBJECTS)
+	$(COMPILE) $(OBJECTS) -I$(UEYE_INCLUDE) -L/usr/lib -lueye_api -lpthread -o runnable
+
+obj/main.o:main.cpp ueye_camera.h console.cpp
+	$(COMPILE) -c main.cpp -I$(UEYE_INCLUDE) -L/usr/lib -lueye_api -lpthread -o obj/main.o
+
+obj/ueye_camera.o:ueye_camera.h ueye_camera.cpp
+	$(COMPILE) -c ueye_camera.cpp -I$(UEYE_INCLUDE) -L/usr/lib -lueye_api -o obj/ueye_camera.o
+
+obj/console.o:console.h console.cpp
+	$(COMPILE) -c console.cpp -o obj/console.o
+
+clean:
+	-rm -r $(OBJECTS) runnable images/*

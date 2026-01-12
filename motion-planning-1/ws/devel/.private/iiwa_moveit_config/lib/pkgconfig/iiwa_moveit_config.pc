@@ -1,4 +1,4 @@
-prefix=/root/ws/devel/.private/iiwa_moveit_config
+prefix=/root/test/motion-planning-1/ws/devel/.private/iiwa_moveit_config
 
 Name: iiwa_moveit_config
 Description: Description of iiwa_moveit_config

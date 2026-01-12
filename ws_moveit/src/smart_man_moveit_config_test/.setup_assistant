@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ""
+    relative_path: /root/test/ws_moveit/src/smart_man_moveit_config_test/config/gazebo_m_robot.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/m_robot.srdf
+  CONFIG:
+    author_name: Yeah
+    author_email: yeah@yeah.com
+    generated_timestamp: 1763389995

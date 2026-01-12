@@ -1,0 +1,4 @@
+Symlinking /root/test/ws_moveit/devel/lib/ply_ros_publisher/ply_ros_publisher
+Symlinking /root/test/ws_moveit/devel/lib/pkgconfig/ply_ros_publisher.pc
+Symlinking /root/test/ws_moveit/devel/share/ply_ros_publisher/cmake/ply_ros_publisherConfig.cmake
+Symlinking /root/test/ws_moveit/devel/share/ply_ros_publisher/cmake/ply_ros_publisherConfig-version.cmake

@@ -1,4 +1,4 @@
-prefix=/root/ws/devel/.private/catkin_tools_prebuild
+prefix=/root/test/motion-planning-1/ws/devel/.private/catkin_tools_prebuild
 
 Name: catkin_tools_prebuild
 Description: Description of catkin_tools_prebuild

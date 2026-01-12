@@ -1,0 +1,8 @@
+prefix=/root/test/ws_moveit/install
+
+Name: ply_publisher
+Description: Description of ply_publisher
+Version: 0.1.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: sensor_msgs

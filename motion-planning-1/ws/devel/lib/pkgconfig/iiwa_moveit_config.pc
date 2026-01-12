@@ -1,1 +1,1 @@
-/root/ws/devel/.private/iiwa_moveit_config/lib/pkgconfig/iiwa_moveit_config.pc
+/root/test/motion-planning-1/ws/devel/.private/iiwa_moveit_config/lib/pkgconfig/iiwa_moveit_config.pc

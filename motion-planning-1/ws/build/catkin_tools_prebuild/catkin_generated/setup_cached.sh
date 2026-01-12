@@ -7,7 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/root/ws/devel/.private/catkin_tools_prebuild:$CMAKE_PREFIX_PATH"
-export PWD='/root/ws/build/catkin_tools_prebuild'
-export ROSLISP_PACKAGE_DIRECTORIES='/root/ws/devel/.private/catkin_tools_prebuild/share/common-lisp'
-export ROS_PACKAGE_PATH="/root/ws/build/catkin_tools_prebuild:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/root/test/motion-planning-1/ws/devel/.private/catkin_tools_prebuild:$CMAKE_PREFIX_PATH"
+export PWD='/root/test/motion-planning-1/ws/build/catkin_tools_prebuild'
+export ROSLISP_PACKAGE_DIRECTORIES='/root/test/motion-planning-1/ws/devel/.private/catkin_tools_prebuild/share/common-lisp'
+export ROS_PACKAGE_PATH="/root/test/motion-planning-1/ws/build/catkin_tools_prebuild:$ROS_PACKAGE_PATH"

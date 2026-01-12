@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+    <group ns="fake_world">
+      <param name="tf_prefix" value="fake_world" />
+      <arg name="debug" default="false"/>
+      <arg name="moveit_controller_manager" default="fake"/>
+
+      <!-- If needed, broadcast static tf for robot root -->
+      <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 world base_link" />
+
+      <!-- We do not have a real robot connected, so publish fake joint states via a joint_state_publisher
+          MoveIt's fake controller's joint states are considered via the 'source_list' parameter -->
+      <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+      </node>
+
+        <!-- Given the published joint states, publish tf for the robot links -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+      <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+      <include file="$(find m_robot_moveit_config)/launch/move_group.launch">
+        <arg name="allow_trajectory_execution" value="true"/>
+        <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
+        <arg name="fake_execution_type" value="interpolate"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="pipeline" value="ompl"/>
+        <arg name="load_robot_description" value="true"/>
+        <arg name="enable_fake_execution" value="true"/>
+      </include>
+
+      <node name="linear_drive_constrained_planing_node" pkg="corosect_invertapro" type="linear_drive_constrained_planing.py" />
+
+    </group>
+</launch>

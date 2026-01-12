@@ -1,0 +1,46 @@
+water_tray: {
+    top_down: {
+      zp: 0.35,
+      xo: 1,
+      yo: 0,
+      zo: 0,
+      wo: 0,
+    },
+  45_degree_angle: {
+    zp: 0.25,
+    xo: 0.271,
+    yo: 0.653,
+    zo: 0.271,
+    wo: 0.653,
+  },
+  90_degree_angle: {
+    zp: 0.25,
+    xo: 0.500,
+    yo: 0.500,
+    zo: 0.500,
+    wo: 0.500,
+  } 
+}
+bird_feeder: {
+    top_down: {
+      zp: 0.35,
+      xo: 1,
+      yo: 0,
+      zo: 0,
+      wo: 0,
+    },
+  45_degree_angle: {
+    zp: 0.25,
+    xo: 0.271,
+    yo: 0.653,
+    zo: 0.271,
+    wo: 0.653,
+  },
+  90_degree_angle: {
+    zp: 0.25,
+    xo: 0.500,
+    yo: 0.500,
+    zo: 0.500,
+    wo: 0.500,
+  } 
+}

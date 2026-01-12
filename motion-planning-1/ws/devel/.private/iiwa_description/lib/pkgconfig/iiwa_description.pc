@@ -1,4 +1,4 @@
-prefix=/root/ws/devel/.private/iiwa_description
+prefix=/root/test/motion-planning-1/ws/devel/.private/iiwa_description
 
 Name: iiwa_description
 Description: Description of iiwa_description

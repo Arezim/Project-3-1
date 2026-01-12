@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /root/ws/src/iiwa_dynamic_demo
+CMAKE_SOURCE_DIR = /root/test/motion-planning-1/ws/src/iiwa_dynamic_demo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /root/ws/build/iiwa_dynamic_demo
+CMAKE_BINARY_DIR = /root/test/motion-planning-1/ws/build/iiwa_dynamic_demo
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -137,9 +137,9 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/ws/build/iiwa_dynamic_demo/CMakeFiles /root/ws/build/iiwa_dynamic_demo/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/test/motion-planning-1/ws/build/iiwa_dynamic_demo/CMakeFiles /root/test/motion-planning-1/ws/build/iiwa_dynamic_demo/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/ws/build/iiwa_dynamic_demo/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/test/motion-planning-1/ws/build/iiwa_dynamic_demo/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

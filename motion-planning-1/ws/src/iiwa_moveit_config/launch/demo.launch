@@ -42,6 +42,8 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
   </group>
 
+  <rosparam command="load" file="$(find iiwa_moveit_config)/config/sensors_3d.yaml" />
+
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
   <include file="$(dirname)/move_group.launch">
     <arg name="allow_trajectory_execution" value="true"/>

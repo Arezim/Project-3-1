@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>iiwa_description</name>
+  <version>0.0.1</version>
+  <description>KUKA iiwa14 robot description (URDF/xacro and launch files).</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>BSD</license>
+
+  <!-- Build tool -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- If you have .xacro files, keep xacro here.
+       If you only use a plain .urdf, it’s still harmless to depend on xacro. -->
+  <build_depend>xacro</build_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <!-- No exports needed for a description-only package -->
+  <export/>
+</package>

@@ -67,14 +67,14 @@ set(iiwa_dynamic_demo_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(iiwa_dynamic_demo_SOURCE_PREFIX /root/ws/src/iiwa_dynamic_demo)
-  set(iiwa_dynamic_demo_DEVEL_PREFIX /root/ws/devel/.private/iiwa_dynamic_demo)
+  set(iiwa_dynamic_demo_SOURCE_PREFIX /root/test/motion-planning-1/ws/src/iiwa_dynamic_demo)
+  set(iiwa_dynamic_demo_DEVEL_PREFIX /root/test/motion-planning-1/ws/devel/.private/iiwa_dynamic_demo)
   set(iiwa_dynamic_demo_INSTALL_PREFIX "")
   set(iiwa_dynamic_demo_PREFIX ${iiwa_dynamic_demo_DEVEL_PREFIX})
 else()
   set(iiwa_dynamic_demo_SOURCE_PREFIX "")
   set(iiwa_dynamic_demo_DEVEL_PREFIX "")
-  set(iiwa_dynamic_demo_INSTALL_PREFIX /root/ws/install)
+  set(iiwa_dynamic_demo_INSTALL_PREFIX /root/test/motion-planning-1/ws/install)
   set(iiwa_dynamic_demo_PREFIX ${iiwa_dynamic_demo_INSTALL_PREFIX})
 endif()
 
@@ -156,7 +156,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /root/ws/install/lib;/root/ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /root/test/motion-planning-1/ws/install/lib;/root/test/motion-planning-1/ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

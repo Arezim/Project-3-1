@@ -1,0 +1,8 @@
+prefix=/root/test/ws_moveit/install
+
+Name: smart_man_moveit_config_test
+Description: Description of smart_man_moveit_config_test
+Version: 0.3.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

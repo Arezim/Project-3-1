@@ -1,1 +1,1 @@
-/root/ws/devel/.private/catkin_tools_prebuild/env.sh
+/root/test/motion-planning-1/ws/devel/.private/catkin_tools_prebuild/env.sh

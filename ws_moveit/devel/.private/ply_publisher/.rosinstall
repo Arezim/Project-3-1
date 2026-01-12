@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /root/test/ws_moveit/devel/.private/ply_publisher/setup.sh

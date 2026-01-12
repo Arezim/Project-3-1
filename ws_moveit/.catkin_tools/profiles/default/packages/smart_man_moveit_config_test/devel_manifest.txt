@@ -1,0 +1,4 @@
+smart_man_moveit_config_test
+/root/test/ws_moveit/devel/.private/smart_man_moveit_config_test/lib/pkgconfig/smart_man_moveit_config_test.pc /root/test/ws_moveit/devel/lib/pkgconfig/smart_man_moveit_config_test.pc
+/root/test/ws_moveit/devel/.private/smart_man_moveit_config_test/share/smart_man_moveit_config_test/cmake/smart_man_moveit_config_testConfig.cmake /root/test/ws_moveit/devel/share/smart_man_moveit_config_test/cmake/smart_man_moveit_config_testConfig.cmake
+/root/test/ws_moveit/devel/.private/smart_man_moveit_config_test/share/smart_man_moveit_config_test/cmake/smart_man_moveit_config_testConfig-version.cmake /root/test/ws_moveit/devel/share/smart_man_moveit_config_test/cmake/smart_man_moveit_config_testConfig-version.cmake

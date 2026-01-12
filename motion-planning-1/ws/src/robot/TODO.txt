@@ -1,0 +1,6 @@
+- establish pipeline for task construction
+-- one block which gives and object name and position
+-- one block which creates the moveit object
+-- one block that generates a target position
+-- one block that does the pick and place with as input the previous 2 blocks
+-- one block that executes the planned task
