@@ -1,0 +1,8 @@
+0000000000000000000000000000000000000000 7a3019fc7939a4046738e0cb884bb5262745ad7b Jan Krueger <jan@krueger-jan.de> 1764066420 +0100	commit (initial): init group1
+7a3019fc7939a4046738e0cb884bb5262745ad7b d233035b149aa3e238fb7575427ab50ae8cd6296 group1 <group1@maastichtuniversity.nl> 1764066475 +0100	commit (amend): init group1
+d233035b149aa3e238fb7575427ab50ae8cd6296 1d41a241d2ba67a75345b1bc4b8d36d0044f4442 group1 <group1@maastichtuniversity.nl> 1764066650 +0100	commit (amend): init group1
+1d41a241d2ba67a75345b1bc4b8d36d0044f4442 1d41a241d2ba67a75345b1bc4b8d36d0044f4442 group1 <group1@maastichtuniversity.nl> 1764066686 +0100	reset: moving to HEAD
+1d41a241d2ba67a75345b1bc4b8d36d0044f4442 a8bfd9e73cac6bc3929d7e4891f7e897958302ae group1 <group1@maastichtuniversity.nl> 1764069224 +0100	commit: troche dziala
+a8bfd9e73cac6bc3929d7e4891f7e897958302ae 81383afbce8f57d9ded56ba713773db89e6835d6 group1 <group1@maastichtuniversity.nl> 1764080943 +0100	commit: nie dziala dalej
+81383afbce8f57d9ded56ba713773db89e6835d6 41dcbe33976eb0f0bb85715c192ee24c98c646b2 group1 <group1@maastichtuniversity.nl> 1764082087 +0100	commit: final_setup.urdf
+41dcbe33976eb0f0bb85715c192ee24c98c646b2 aadb5ac06f75f996ea7906e8bfbd211738958ef6 group1 <group1@maastichtuniversity.nl> 1764087822 +0100	commit: dziala!
