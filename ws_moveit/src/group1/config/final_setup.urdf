@@ -718,13 +718,13 @@
         <visual>
             <origin rpy="0 0 0" xyz="-0.01 0 0" />
             <geometry>
-                <mesh filename="package://zed_interfaces/meshes/zed2i.stl" />
+                <mesh filename="package://iiwa_description/meshes/zed2i.stl" />
             </geometry>
             <material name="zed2i_mat" />
         </visual>
         <collision>
             <geometry>
-                <mesh filename="package://zed_interfaces/meshes/zed2i.stl" />
+                <mesh filename="package://iiwa_description/meshes/zed2i.stl" />
             </geometry>
         </collision>
         <inertial>
