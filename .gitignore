@@ -1,1 +1,3 @@
 /ws_moveit/build
+/motion-planning-1/ws/.catkin_tools
+/motion-planning-1/ws/build
