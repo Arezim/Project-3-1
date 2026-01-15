@@ -2,11 +2,26 @@ sensors:
   - sensor_plugin: occupancy_map_monitor/DepthImageOctomapUpdater
     image_topic: /camera/depth/image_rect_raw
     queue_size: 5
-    near_clipping_plane_distance: 0.1
+    near_clipping_plane_distance: 0.3
     far_clipping_plane_distance: 5.0
     shadow_threshold: 0.2
-    padding_scale: 4.0
-    padding_offset: 0.5
+    padding_scale: 1.0
+    padding_offset: 0.06
     max_update_rate: 1.0
     filtered_cloud_topic: filtered_cloud
     ns: octomap
+
+# sensors:
+#   - sensor_plugin: occupancy_map_monitor/DepthImageOctomapUpdater
+#     image_topic: /camera/depth/image_rect_raw
+#     queue_size: 5
+#     near_clipping_plane_distance: 0.3
+#     far_clipping_plane_distance: 5.0
+#     shadow_threshold: 0.2
+#     padding_scale: 1.0
+#     padding_offset: 0.03
+#     max_update_rate: 10.0
+#     filtered_cloud_topic: filtered_cloud
+#     ns: octomap
+#     shape_padding: 0.02
+#     shape_scale: 1.0
