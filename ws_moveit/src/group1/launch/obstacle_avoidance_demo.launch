@@ -1,7 +1,6 @@
 <launch>
 	<include file="$(find group1)/launch/demo.launch" />
-	<param name="robot_description_planning/shape_transform_cache_lookup_wait_time" value="0.5"/>
-<!-- 	
-	<node pkg="tf2_ros" type="static_transform_publisher" name="to_robot" args="0 0 0 0 0 0 world m_robot_link_0" />
-	<node pkg="tf2_ros" type="static_transform_publisher" name="to_camera" args="0 0 0 0 0 0 world base_link" /> -->
+	<param name="robot_description_planning/shape_transform_cache_lookup_wait_time" value="0.1"/>	
+	<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="to_robot" args="0 0 0 0 0 0 base_link camera_link" /> -->
+	<node pkg="tf2_ros" type="static_transform_publisher" name="to_camera" args="0 0 0 0 0 0 base_link world " />
 </launch>
