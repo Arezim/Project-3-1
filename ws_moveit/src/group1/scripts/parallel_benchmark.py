@@ -1,103 +1,105 @@
 #!/usr/bin/env python3
 """
-Planner Benchmark: Tests multiple OMPL planners on a cyclic path:
-    hell_yeah -> Position A -> Position B -> hell_yeah
-    
-With optional obstacles to simulate real-world scenarios.
+Planner Benchmark + Integration Handshake
 
-Uses the planning logic from compare_planners.py for consistency with actual robot operations.
+Path:
+    hell_yeah -> SLIDER_BOX -> FAULT_DETECTION -> PRESS -> hell_yeah
+
+After each reached waypoint (except HOME), Group1:
+  - publishes /group1/motion/isTargetReached = True
+  - (optionally) publishes /group1/allowFaultDetection = True only at FAULT_DETECTION
+  - resets /group1/getNewGoal = False (prep reset)
+  - waits until /group1/getNewGoal becomes True (LEVEL signal, not a pulse)
+  - ACK resets /group1/getNewGoal back to False
+  - clears isTargetReached + allowFaultDetection
 """
 import os
-import csv
 import math
 import threading
 from typing import Dict, List, Optional, Tuple
 
 import rospy
+from std_msgs.msg import Bool
 from moveit_commander import (
-    roscpp_initialize, roscpp_shutdown, 
-    RobotCommander, MoveGroupCommander, PlanningSceneInterface
+    roscpp_initialize,
+    RobotCommander,
+    MoveGroupCommander,
+    PlanningSceneInterface,
 )
-from geometry_msgs.msg import Pose, PoseStamped
+from geometry_msgs.msg import Pose
 from shape_msgs.msg import SolidPrimitive
-from moveit_msgs.msg import (
-    CollisionObject, RobotTrajectory, DisplayTrajectory
-)
+from moveit_msgs.msg import CollisionObject, RobotTrajectory, DisplayTrajectory
 
+
+# =========================
 # CONFIGURATION
+# =========================
 PLANNERS: Dict[str, str] = {
     "RRTConnectkConfigDefault": "RRTConnect",
     "PRMkConfigDefault": "PRM",
     "RRTstarkConfigDefault": "RRT*",
 }
 
-RUNS = 1  # Number of complete cycles through all positions
-TIME_LIMIT = 10.0  # Planning time per motion (seconds)
-NUM_ATTEMPTS = 3  # Number of planning attempts per planner
+RUNS = 3
+TIME_LIMIT = 10.0
+NUM_ATTEMPTS = 3
 RESULTS_DIR = os.path.expanduser("~/benchmarks")
 
-# Enable/disable obstacles
-USE_OBSTACLES = True
-
-# Use joint targets instead of pose targets
+USE_OBSTACLES = False
 USE_JOINT_TARGETS = True
 
-# hell_yeah joint configuration (from SRDF)
-# [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6, joint_7]
 HELL_YEAH_JOINTS = [0.0, 0.0, 0.0, -1.5708, 0.0, 1.5708, 0.0]
 
-# Position A: Custom position from RViz (reaching to the left/back side)
 POSITION_A = {
     "name": "Position_A",
-    "position": [0.5, -0.3, 0.1],  # Approximate Cartesian (not used with joint targets)
+    "position": [0.57105, 0.00817, 0.25738],
     "orientation": [0.0, 0.0, 0.0, 1.0],
-    # Exact joint values from RViz
+    "joints": [0.1316, 0.7100, -0.1201, -1.6096, -0.0627, 0.7987, 0.0298],
+}
+
+POSITION_B = {
+    "name": "Position_B",
+    "position": [0.5, -0.3, 0.1],
+    "orientation": [0.0, 0.0, 0.0, 1.0],
     "joints": [-1.240, 0.702, -0.353, -1.661, 0.472, 0.424, 1.283],
 }
 
-# Position B: Custom position from RViz (reaching forward)
-POSITION_B = {
-    "name": "Position_B",
-    "position": [0.5, 0.3, 0.1],  # Approximate Cartesian (not used with joint targets)
+POSITION_C = {
+    "name": "Position_C",
+    "position": [0.5, 0.3, 0.1],
     "orientation": [0.0, 0.0, 0.0, 1.0],
-    # Exact joint values from RViz
-    "joints": [0.029, 0.883, -0.062, -1.423, -0.046, 0.340, 0.057],
+    "joints": [1.240, 0.702, -0.353, -1.661, 0.472, 0.424, 1.283],
 }
 
-# Obstacles
 OBSTACLES = [
     {
         "name": "obstacle_A_to_B",
         "type": "box",
-        "dimensions": [0.1, 0.2, 0.2],  # Size: 10cm x 20cm x 20cm
-        "position": [0.25, -0.7, 1.25],  # Placed between A and B
+        "dimensions": [0.1, 0.2, 0.2],
+        "position": [0.25, -0.7, 1.25],
     },
     {
         "name": "obstacle_near_B",
-        "type": "box", 
-        "dimensions": [0.15, 0.15, 0.5],  # Tall thin obstacle (useless for now)
+        "type": "box",
+        "dimensions": [0.15, 0.15, 0.5],
         "position": [0.45, 0.15, 0.8],
     },
 ]
 
 
+# =========================
+# HELPERS
+# =========================
 def joint_path_length(points: List) -> float:
-    """Calculate total joint-space path length."""
     if len(points) < 2:
         return 0.0
     total = 0.0
     for first, second in zip(points[:-1], points[1:]):
-        total += math.sqrt(
-            sum((a - b) ** 2 for a, b in zip(first.positions, second.positions))
-        )
+        total += math.sqrt(sum((a - b) ** 2 for a, b in zip(first.positions, second.positions)))
     return total
 
 
 def to_robot_trajectory(plan: object) -> Optional[RobotTrajectory]:
-    """
-    Normalize MoveGroupCommander.plan results to RobotTrajectory.
-    Handles different return types from different MoveIt versions.
-    """
     if isinstance(plan, RobotTrajectory):
         return plan
     if isinstance(plan, tuple) and plan:
@@ -114,14 +116,7 @@ def to_robot_trajectory(plan: object) -> Optional[RobotTrajectory]:
     return None
 
 
-def cartesian_path_length(pts, group):
-    """Estimate cartesian path length of end-effector (approximate)."""
-    # This would require FK for each point - simplified version
-    return len(pts)  # Just return number of waypoints as proxy
-
-
 def wait_for_param(name: str, timeout: float = 30.0) -> bool:
-    """Wait for a ROS parameter to become available."""
     start = rospy.get_time()
     while not rospy.is_shutdown():
         if rospy.has_param(name):
@@ -139,240 +134,227 @@ def plan_with_planner(
     planning_time: float = TIME_LIMIT,
     num_attempts: int = NUM_ATTEMPTS,
 ) -> Tuple[bool, Optional[RobotTrajectory], float, int, float]:
-    """
-    Plan with a specific planner to a target.
-    
-    Args:
-        group: MoveGroupCommander instance
-        planner_id: OMPL planner ID (e.g., "RRTConnectkConfigDefault")
-        target: Dict with 'type' and target data ('joints', 'pose', or 'name')
-        planning_time: Maximum planning time in seconds
-        num_attempts: Number of planning attempts
-    
-    Returns:
-        Tuple of (success, trajectory, wall_time, num_points, path_length)
-    """
-    # Configure planner
     group.set_start_state_to_current_state()
     group.set_planner_id(planner_id)
     group.set_planning_time(planning_time)
     group.set_num_planning_attempts(num_attempts)
-    
-    # Set goal based on target type
-    target_type = target.get("type", "joints")
-    if target_type == "named":
+
+    ttype = target.get("type", "joints")
+    if ttype == "named":
         group.set_named_target(target["name"])
-    elif target_type == "joints":
+    elif ttype == "joints":
         group.set_joint_value_target(target["joints"])
-    elif target_type == "pose":
+    elif ttype == "pose":
         group.set_pose_target(target["pose"])
     else:
-        rospy.logwarn(f"Unknown target type: {target_type}")
+        rospy.logwarn(f"Unknown target type: {ttype}")
         return False, None, 0.0, 0, 0.0
-    
-    # Plan and measure time
+
     start_time = rospy.get_time()
     plan_result = group.plan()
     wall_time = rospy.get_time() - start_time
-    
-    # Normalize trajectory using compare_planners logic
-    trajectory = to_robot_trajectory(plan_result)
-    success = bool(trajectory and trajectory.joint_trajectory.points)
-    
-    # Calculate metrics
+
+    traj = to_robot_trajectory(plan_result)
+    success = bool(traj and traj.joint_trajectory.points)
+
     num_points = 0
-    path_length = 0.0
-    if success and trajectory:
-        points = trajectory.joint_trajectory.points
-        num_points = len(points)
-        path_length = joint_path_length(points)
-    
-    # Clear targets
+    length = 0.0
+    if success and traj:
+        pts = traj.joint_trajectory.points
+        num_points = len(pts)
+        length = joint_path_length(pts)
+
     group.clear_pose_targets()
-    
-    return success, trajectory, wall_time, num_points, path_length
+    return success, traj, wall_time, num_points, length
 
 
 def create_pose(position: List[float], orientation: List[float]) -> Pose:
-    """Create a Pose message from position [x,y,z] and orientation [x,y,z,w]."""
     pose = Pose()
-    pose.position.x = position[0]
-    pose.position.y = position[1]
-    pose.position.z = position[2]
-    pose.orientation.x = orientation[0]
-    pose.orientation.y = orientation[1]
-    pose.orientation.z = orientation[2]
-    pose.orientation.w = orientation[3]
+    pose.position.x, pose.position.y, pose.position.z = position
+    pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w = orientation
     return pose
 
 
 def add_obstacles(scene, frame_id="world"):
-    """Add obstacle boxes to the planning scene."""
-    rospy.sleep(0.5)  # Let the scene initialize
-    
+    rospy.sleep(0.5)
     for obs in OBSTACLES:
-        collision_object = CollisionObject()
-        collision_object.header.frame_id = frame_id
-        collision_object.id = obs["name"]
-        
-        # Create box primitive
+        co = CollisionObject()
+        co.header.frame_id = frame_id
+        co.id = obs["name"]
+
         box = SolidPrimitive()
         box.type = SolidPrimitive.BOX
         box.dimensions = obs["dimensions"]
-        
-        # Set pose
+
         box_pose = Pose()
-        box_pose.position.x = obs["position"][0]
-        box_pose.position.y = obs["position"][1]
-        box_pose.position.z = obs["position"][2]
+        box_pose.position.x, box_pose.position.y, box_pose.position.z = obs["position"]
         box_pose.orientation.w = 1.0
-        
-        collision_object.primitives.append(box)
-        collision_object.primitive_poses.append(box_pose)
-        collision_object.operation = CollisionObject.ADD
-        
-        scene.add_object(collision_object)
+
+        co.primitives.append(box)
+        co.primitive_poses.append(box_pose)
+        co.operation = CollisionObject.ADD
+
+        scene.add_object(co)
         print(f"  Added obstacle: {obs['name']} at {obs['position']}")
-    
-    rospy.sleep(0.5)  # Let obstacles propagate
+    rospy.sleep(0.5)
 
 
 def remove_obstacles(scene):
-    """Remove all benchmark obstacles from the scene."""
     for obs in OBSTACLES:
         scene.remove_world_object(obs["name"])
     rospy.sleep(0.3)
 
 
-# MAIN BENCHMARK
+def publish_bool(pub, value: bool, label: str = ""):
+    pub.publish(Bool(value))
+    if label:
+        rospy.loginfo("[handshake] %s = %s", label, value)
+
+
+def wait_for_new_goal_level(timeout: float = 300.0) -> bool:
+    """
+    LEVEL handshake: wait until /group1/getNewGoal becomes True (and stays True until we ACK reset).
+    """
+    t0 = rospy.Time.now().to_sec()
+    while not rospy.is_shutdown():
+        try:
+            msg = rospy.wait_for_message("/group1/getNewGoal", Bool, timeout=0.5)
+            if msg.data:
+                return True
+        except rospy.ROSException:
+            pass
+        if rospy.Time.now().to_sec() - t0 > timeout:
+            return False
+    return False
+
+
+def do_handoff(stage: str, pub_target_reached, pub_allow_fault, pub_get_new_goal_reset):
+    """
+    Common handoff logic after reaching a waypoint.
+    """
+    is_fault_stage = (stage == "FAULT_DETECTION")
+
+    publish_bool(pub_allow_fault, is_fault_stage, "/group1/allowFaultDetection")
+    publish_bool(pub_target_reached, True, "/group1/motion/isTargetReached")
+
+    # Prep reset: ensure we won't be fooled by an old True
+    publish_bool(pub_get_new_goal_reset, False, "/group1/getNewGoal (prep reset)")
+
+    rospy.loginfo("[handshake] Waiting for /group1/getNewGoal=True (stage=%s)...", stage)
+    ok = wait_for_new_goal_level(timeout=300.0)
+
+    if not ok:
+        rospy.logwarn("[handshake] Timeout waiting for /group1/getNewGoal. Continuing anyway...")
+    else:
+        rospy.loginfo("[handshake] Received /group1/getNewGoal=True. Continuing.")
+        publish_bool(pub_get_new_goal_reset, False, "/group1/getNewGoal (ACK reset)")
+
+    # Clear for next leg
+    publish_bool(pub_target_reached, False, "/group1/motion/isTargetReached")
+    publish_bool(pub_allow_fault, False, "/group1/allowFaultDetection")
+
+
+# =========================
+# MAIN
+# =========================
 def main():
     roscpp_initialize([])
     rospy.init_node("parallel_planning_benchmark", anonymous=True)
-    
+
     print("[benchmark] Starting parallel planning benchmark...")
     print(f"[benchmark] Planners: {list(PLANNERS.values())}")
     print(f"[benchmark] Planning time: {TIME_LIMIT}s, Attempts: {NUM_ATTEMPTS}")
 
-    # Detect namespace (check for iiwa namespace first, then default)
     ns = ""
     desc = "robot_description"
     if rospy.has_param("/iiwa/robot_description"):
         ns = "/iiwa"
         desc = "/iiwa/robot_description"
-    
     print(f"[benchmark] Using robot_description: {desc}")
 
-    # Wait for model
     if not wait_for_param(desc, 30.0):
         raise RuntimeError(f"Timeout waiting for {desc}. Is MoveIt running?")
 
     robot = RobotCommander(robot_description=desc, ns=ns)
     scene = PlanningSceneInterface(ns=ns)
     groups = robot.get_group_names()
-    
-    # Find the arm group
+
     group_name = "arm" if "arm" in groups else ("manipulator" if "manipulator" in groups else groups[0])
     print(f"[benchmark] Using planning group: {group_name}")
     print(f"[benchmark] Available groups: {groups}")
-    
-    # Initialize move group
-    group = MoveGroupCommander(group_name, ns=ns)
-    ee_link = group.get_end_effector_link()
-    planning_frame = group.get_planning_frame()
-    print(f"[benchmark] End effector: {ee_link}")
-    print(f"[benchmark] Planning frame: {planning_frame}")
-    
-    # Setup trajectory display publisher (like compare_planners.py)
-    display_pub = rospy.Publisher(
-        "move_group/display_planned_path", DisplayTrajectory, queue_size=10
-    )
-    
-    # Print current joint values for debugging
-    current_joints = group.get_current_joint_values()
-    print(f"[benchmark] Current joint values: {[f'{j:.3f}' for j in current_joints]}")
-    
-    # Try to get known planner IDs
-    try:
-        known_planners = group.get_known_planner_ids()
-        print(f"[benchmark] Known planner IDs: {known_planners[:10]}..." if len(known_planners) > 10 else f"[benchmark] Known planner IDs: {known_planners}")
-    except Exception as e:
-        rospy.logwarn(f"Could not get known planner IDs: {e}")
-    
-    # Setup results directory
-    os.makedirs(RESULTS_DIR, exist_ok=True)
-    import time as time_module
-    stamp = time_module.strftime("%Y%m%d-%H%M%S")
-    out_csv = os.path.join(RESULTS_DIR, f"bench_{group_name}_{stamp}.csv")
 
-    # Add obstacles to the scene (only if enabled)
+    group = MoveGroupCommander(group_name, ns=ns)
+    print(f"[benchmark] End effector: {group.get_end_effector_link()}")
+    print(f"[benchmark] Planning frame: {group.get_planning_frame()}")
+
+    display_pub = rospy.Publisher("move_group/display_planned_path", DisplayTrajectory, queue_size=10)
+
+    # Handshake pubs (Group1 -> others + ACK reset of getNewGoal)
+    pub_target_reached = rospy.Publisher("/group1/motion/isTargetReached", Bool, queue_size=10, latch=True)
+    pub_allow_fault = rospy.Publisher("/group1/allowFaultDetection", Bool, queue_size=10, latch=True)
+    pub_get_new_goal_reset = rospy.Publisher("/group1/getNewGoal", Bool, queue_size=10)  # NOT latched
+
+    publish_bool(pub_target_reached, False, "/group1/motion/isTargetReached")
+    publish_bool(pub_allow_fault, False, "/group1/allowFaultDetection")
+    publish_bool(pub_get_new_goal_reset, False, "/group1/getNewGoal (init reset)")
+
+    cur = group.get_current_joint_values()
+    print(f"[benchmark] Current joint values: {[f'{j:.3f}' for j in cur]}")
+
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+
     if USE_OBSTACLES:
         print("\n=== Adding Obstacles ===")
-        add_obstacles(scene, frame_id=planning_frame)
+        add_obstacles(scene, frame_id=group.get_planning_frame())
     else:
         print("\n=== Obstacles DISABLED ===")
-    
-    # Define the waypoint sequence - full cyclic path
+
     if USE_JOINT_TARGETS:
         waypoints = [
-            {"name": "hell_yeah", "type": "joints", "joints": HELL_YEAH_JOINTS},
-            {"name": POSITION_A["name"], "type": "joints", "joints": POSITION_A["joints"]},
-            {"name": POSITION_B["name"], "type": "joints", "joints": POSITION_B["joints"]},
-            {"name": "hell_yeah", "type": "joints", "joints": HELL_YEAH_JOINTS},
+            {"name": "hell_yeah",        "stage": "HOME",            "type": "joints", "joints": HELL_YEAH_JOINTS},
+            {"name": POSITION_C["name"], "stage": "SLIDER_BOX",      "type": "joints", "joints": POSITION_C["joints"]},
+            {"name": POSITION_A["name"], "stage": "FAULT_DETECTION", "type": "joints", "joints": POSITION_A["joints"]},
+            {"name": POSITION_B["name"], "stage": "PRESS",           "type": "joints", "joints": POSITION_B["joints"]},
+            {"name": "hell_yeah",        "stage": "HOME",            "type": "joints", "joints": HELL_YEAH_JOINTS},
         ]
         print("\n=== Using JOINT targets ===")
     else:
         waypoints = [
-            {"name": "hell_yeah", "type": "joints", "joints": HELL_YEAH_JOINTS},
-            {"name": POSITION_A["name"], "type": "pose", "pose": create_pose(POSITION_A["position"], POSITION_A["orientation"])},
-            {"name": POSITION_B["name"], "type": "pose", "pose": create_pose(POSITION_B["position"], POSITION_B["orientation"])},
-            {"name": "hell_yeah", "type": "joints", "joints": HELL_YEAH_JOINTS},
+            {"name": "hell_yeah",        "stage": "HOME",            "type": "joints", "joints": HELL_YEAH_JOINTS},
+            {"name": POSITION_C["name"], "stage": "SLIDER_BOX",      "type": "pose", "pose": create_pose(POSITION_C["position"], POSITION_C["orientation"])},
+            {"name": POSITION_A["name"], "stage": "FAULT_DETECTION", "type": "pose", "pose": create_pose(POSITION_A["position"], POSITION_A["orientation"])},
+            {"name": POSITION_B["name"], "stage": "PRESS",           "type": "pose", "pose": create_pose(POSITION_B["position"], POSITION_B["orientation"])},
+            {"name": "hell_yeah",        "stage": "HOME",            "type": "joints", "joints": HELL_YEAH_JOINTS},
         ]
         print("\n=== Using POSE targets (Cartesian) ===")
-    
-    print(f"\n=== Benchmark Path ===")
+
+    print("\n=== Benchmark Path ===")
     for i, wp in enumerate(waypoints):
-        print(f"  {i+1}. {wp['name']}")
+        print(f"  {i+1}. {wp['name']} ({wp.get('stage','')})")
 
     for run in range(1, RUNS + 1):
-        print(f"\n{'='*60}")
-        print(f"RUN {run}/{RUNS}")
-        print(f"{'='*60}")
-        
-        # Check if robot is at hell_yeah position
+        print(f"\n{'='*60}\nRUN {run}/{RUNS}\n{'='*60}")
+
         current = group.get_current_joint_values()
-        print(f"\n>>> Checking starting position...")
-        print(f"    Current joints:   {[f'{j:.3f}' for j in current]}")
-        print(f"    Expected (hell_yeah): {[f'{j:.3f}' for j in HELL_YEAH_JOINTS]}")
-        
-        # Check if close enough to hell_yeah
         diff = sum(abs(c - h) for c, h in zip(current, HELL_YEAH_JOINTS))
-        if diff > 0.1:
-            print(f"\n    WARNING: Robot is NOT at hell_yeah position! (diff={diff:.3f} rad)")
-            print(f"    Continuing anyway...")
-        else:
-            print(f"    ✓ Robot is at hell_yeah position (diff={diff:.3f} rad)")
-        
+        print(f"\n>>> Start joints: {[f'{j:.3f}' for j in current]}")
+        print(f">>> hell_yeah:    {[f'{j:.3f}' for j in HELL_YEAH_JOINTS]}")
+        print(f">>> diff: {diff:.3f} rad")
+
         rospy.sleep(0.5)
-        
-        # Execute each motion in the sequence
+
         for motion_idx in range(len(waypoints) - 1):
             from_wp = waypoints[motion_idx]
             to_wp = waypoints[motion_idx + 1]
             motion_name = f"{from_wp['name']} -> {to_wp['name']}"
-            
             print(f"\n--- Motion {motion_idx + 1}: {motion_name} ---")
-            
-            # Dictionary to store results from parallel planning
+
             results: Dict[str, dict] = {}
             threads: List[threading.Thread] = []
             results_lock = threading.Lock()
-            
+
             def try_plan_thread(planner_id: str, display_name: str):
-                """Plan with a specific planner in a separate thread."""
-                # Create a new MoveGroupCommander for thread safety
                 g = MoveGroupCommander(group_name, ns=ns)
-                
-                # Use the unified planning function
                 success, trajectory, wall_time, num_points, path_length = plan_with_planner(
                     group=g,
                     planner_id=planner_id,
@@ -380,7 +362,6 @@ def main():
                     planning_time=TIME_LIMIT,
                     num_attempts=NUM_ATTEMPTS,
                 )
-                
                 with results_lock:
                     results[planner_id] = {
                         "display_name": display_name,
@@ -388,83 +369,83 @@ def main():
                         "time": wall_time,
                         "points": num_points,
                         "length": path_length,
-                        "trajectory": trajectory
+                        "trajectory": trajectory,
                     }
-            
-            # Run all planners in parallel
+
             for planner_id, display_name in PLANNERS.items():
                 t = threading.Thread(target=try_plan_thread, args=(planner_id, display_name))
                 t.start()
                 threads.append(t)
-            
-            # Wait for all planners to complete
+
             for t in threads:
                 t.join()
-            
-            # Display results
-            print(f"\n  Results:")
+
+            print("\n  Results:")
             for planner_id, res in results.items():
                 status = "✓" if res["success"] else "✗"
-                print(f"    {res['display_name']:12} [{planner_id}]: {status} "
-                      f"time={res['time']:.3f}s, waypoints={res['points']}, path_len={res['length']:.4f}")
-            
-            # Select and execute the best successful plan
+                print(
+                    f"    {res['display_name']:12} [{planner_id}]: {status} "
+                    f"time={res['time']:.3f}s, waypoints={res['points']}, path_len={res['length']:.4f}"
+                )
+
             successful = [(pid, res) for pid, res in results.items() if res["success"]]
-            
+
             if successful:
-                # Pick shortest path among successful planners
                 best_pid, best_res = min(successful, key=lambda x: x[1]["length"])
                 print(f"\n  Selected: {best_res['display_name']} (shortest path: {best_res['length']:.4f})")
-                
-                # Publish trajectory for visualization (like compare_planners.py)
+
                 if best_res["trajectory"]:
                     display_msg = DisplayTrajectory()
                     display_msg.trajectory_start = robot.get_current_state()
                     display_msg.trajectory.append(best_res["trajectory"])
                     display_pub.publish(display_msg)
-                    rospy.sleep(0.5)  # Let RViz update
-                
-                # Execute the trajectory
-                print(f"  Executing trajectory...")
+                    rospy.sleep(0.2)
+
+                print("  Executing trajectory...")
                 group.set_start_state_to_current_state()
                 group.execute(best_res["trajectory"], wait=True)
                 group.stop()
-                print(f"  Execution complete.")
-                rospy.sleep(1.0)  # Wait for robot to settle
-                
+                print("  Execution complete.")
+                rospy.sleep(0.5)
+
+                # Handshake after reaching destination (skip HOME stages if you want)
+                stage = to_wp.get("stage", "")
+                if stage != "HOME":
+                    do_handoff(stage, pub_target_reached, pub_allow_fault, pub_get_new_goal_reset)
+
             else:
                 print("\n  WARNING: All planners failed!")
                 print("  Attempting fallback with go() command...")
-                
-                # Fallback: try using go() directly
+
                 if to_wp["type"] == "named":
                     group.set_named_target(to_wp["name"])
                 elif to_wp["type"] == "joints":
                     group.set_joint_value_target(to_wp["joints"])
                 else:
                     group.set_pose_target(to_wp["pose"])
-                
+
                 success = group.go(wait=True)
                 group.stop()
-                
+
                 if success:
-                    print(f"  Fallback execution successful.")
+                    print("  Fallback execution successful.")
+                    rospy.sleep(0.5)
+                    stage = to_wp.get("stage", "")
+                    if stage != "HOME":
+                        do_handoff(stage, pub_target_reached, pub_allow_fault, pub_get_new_goal_reset)
                 else:
-                    print(f"  Fallback also failed! Skipping this motion.")
-                
-                rospy.sleep(1.0)
-        
+                    print("  Fallback also failed! Skipping this motion.")
+                    rospy.sleep(1.0)
+
         print(f"\n>>> Run {run} complete!")
-    
-    # Cleanup
+
     if USE_OBSTACLES:
         remove_obstacles(scene)
         print("  Obstacles removed.")
-    
+
     print("\n[benchmark] Benchmark complete!")
-    roscpp_shutdown()
+    rospy.spin()
 
 
 if __name__ == "__main__":
     main()
-
