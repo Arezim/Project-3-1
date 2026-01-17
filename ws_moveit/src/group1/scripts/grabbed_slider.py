@@ -41,8 +41,11 @@ from geometry_msgs.msg import PoseStamped
 from moveit_msgs.msg import RobotTrajectory
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from iiwa_msgs.msg import MoveAlongJointSplineActionResult
+from std_msgs.msg import Bool
+from std_msgs.msg import Float64
 import moveit_msgs.msg
 import geometry_msgs.msg
+import threading
 
 
 def make_pose(x, y, z, q=None, frame="base_link"):
@@ -129,22 +132,50 @@ class MoveGroupPythonInterfaceTutorial(object):
         rospy.sleep(0.4)
         rospy.init_node("grabber", anonymous=False)
 
-        display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=20)
-        planning_scene_diff_publisher = rospy.Publisher("planning_scene", moveit_msgs.msg.PlanningScene, queue_size=1)
-            # time-slicing parameters
-        slice_sec = float(rospy.get_param("~slice_sec", 0.5))
-        goal_tolerance = float(rospy.get_param("~goal_tolerance", 0.03))
+        display_trajectory_publisher = rospy.Publisher(
+            "/move_group/display_planned_path",
+            moveit_msgs.msg.DisplayTrajectory,
+            queue_size=20,
+        )
+        planning_scene_diff_publisher = rospy.Publisher(
+            "planning_scene", moveit_msgs.msg.PlanningScene, queue_size=1
+        )
 
-        vel_scale = float(rospy.get_param("~vel_scale", 0.1))
-        acc_scale = float(rospy.get_param("~acc_scale", 0.1))
+        # -----------------------------
+        # HARD-CODED CONFIGURATION
+        # -----------------------------
+        # Visual-servoing node publishes grasp offset [m] on this topic:
+        self.grasp_offset_topic = "/group4/graspOffset"  # std_msgs/Float64
 
-        # targets (default: same A/B as marker_points.py & experiment_runner.py)
-        A = rospy.get_param("~target_A", {"x": -0.5, "y": -0.80, "z": 1.4})
-        B = rospy.get_param("~target_B", {"x": 0.0, "y": -0.30, "z": 0.9})
+        # Visual-servoing (or gripper logic) publishes whether the slider is currently grabbed:
+        self.slider_grabbed_topic = "/group4/isSliderGrabbed"  # std_msgs/Bool
+
+        # Axis of allowed offset in the gripper frame: 'x'/'y'/'z'
+        self.grasp_axis = "x"
+
+        # Frame in which the box pose is specified when adding to the scene
+        self.gripper_frame = "rg6_link_0"
+
+        # Name of the collision object
+        self.box_name = "slider"
+
+        # Box size in meters: [x, y, z]
+        self.profile_size = [0.782, 0.056, 0.025]
+
+        # Constant offset of the box w.r.t. gripper frame
+        self.box_static_offset = {"x": 0.0, "y": 0.0, "z": 0.2}
+
+        # MoveIt group scaling
+        vel_scale = 0.1
+        acc_scale = 0.1
+
+        # targets (kept for compatibility; not used here)
+        A = {"x": -0.5, "y": -0.80, "z": 1.4}
+        B = {"x": 0.0, "y": -0.30, "z": 0.9}
 
         DOWN_Q = {"x": 1.0, "y": 0.0, "z": 0.0, "w": 0.0}  # gripper down
 
-        frame_id = rospy.get_param("~frame_id", "base_link")
+        frame_id = "base_link"
 
         robot = moveit_commander.RobotCommander()
         scene = moveit_commander.PlanningSceneInterface()
@@ -156,14 +187,63 @@ class MoveGroupPythonInterfaceTutorial(object):
         group.set_planning_time(10)
         group.set_num_planning_attempts(5)
         rospy.sleep(0.1)
-        self.box_name = ""
         self.robot = robot
         self.scene = scene
         self.move_group = group
         self.eef_link = eef_link
 
+        # Latest incoming state from topics
+        self._lock = threading.Lock()
+        self._latest_grabbed = False
+        self._latest_offset = 0.0
+        self._is_attached = False
+
+        rospy.Subscriber(self.slider_grabbed_topic, Bool, self._on_slider_grabbed, queue_size=1)
+        rospy.Subscriber(self.grasp_offset_topic, Float64, self._on_grasp_offset, queue_size=1)
+
+    def _on_slider_grabbed(self, msg):
+        grabbed = bool(msg.data)
+        with self._lock:
+            prev = self._latest_grabbed
+            self._latest_grabbed = grabbed
+
+        # Only act on edges
+        if grabbed == prev:
+            return
+
+        if grabbed:
+            self._attach_with_latest_offset()
+        else:
+            self.detach_and_remove_box()
+
+    def _on_grasp_offset(self, msg):
+        with self._lock:
+            self._latest_offset = float(msg.data)
+
+    def _attach_with_latest_offset(self):
+        with self._lock:
+            if self._is_attached:
+                return
+            offset = self._latest_offset
+
+        self.add_box(grasp_offset=offset)
+        self.attach_box()
+
+        with self._lock:
+            self._is_attached = True
+
+    def _clamp_grasp_offset(self, grasp_offset):
+        axis = self.grasp_axis
+        if axis not in ("x", "y", "z"):
+            rospy.logwarn("Invalid grasp_axis '%s' (expected x/y/z); using 'x'", axis)
+            axis = "x"
+
+        axis_index = {"x": 0, "y": 1, "z": 2}[axis]
+        half_len = 0.5 * float(self.profile_size[axis_index])
+        return max(-half_len, min(half_len, float(grasp_offset)))
+
     #Function source: https://github.com/moveit/moveit_tutorials/blob/master/doc/move_group_python_interface/scripts/move_group_python_interface_tutorial.py # Author: Acorn Pooley, Mike Lautman
-    def add_box(self, timeout=4):
+    def add_box(self, grasp_offset=None):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
         # reason not to.
@@ -176,107 +256,86 @@ class MoveGroupPythonInterfaceTutorial(object):
         ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         ## First, we will create a box in the planning scene between the fingers:
         box_pose = geometry_msgs.msg.PoseStamped()
-        box_pose.header.frame_id = "rg6_link_0"
+        box_pose.header.frame_id = self.gripper_frame
         box_pose.pose.orientation.w = 1.0
-        box_pose.pose.position.z = 0.2 # above the panda_hand frame
-        box_name = "box"
-        scene.add_box(box_name, box_pose, size=(0.4, 0.05, 0.01))
+        box_pose.pose.position.x = self.box_static_offset["x"]
+        box_pose.pose.position.y = self.box_static_offset["y"]
+        box_pose.pose.position.z = self.box_static_offset["z"]
+
+        if grasp_offset is not None:
+            clamped = self._clamp_grasp_offset(grasp_offset)
+            if self.grasp_axis == "x":
+                box_pose.pose.position.x += clamped
+            elif self.grasp_axis == "y":
+                box_pose.pose.position.y += clamped
+            else:
+                box_pose.pose.position.z += clamped
+
+        scene.add_box(box_name, box_pose, size=tuple(self.profile_size))
 
         ## END_SUB_TUTORIAL
         # Copy local variables back to class variables. In practice, you should use the class
         # variables directly unless you have a good reason not to.
         self.box_name = box_name
-        return self.wait_for_state_update(box_is_known=True, timeout=timeout)
+        return True
 
 
         #Function source: https://github.com/moveit/moveit_tutorials/blob/master/doc/move_group_python_interface/scripts/move_group_python_interface_tutorial.py # Author: Acorn Pooley, Mike Lautman
-    def attach_box(self, timeout=4):
-            # Copy class variables to local variables to make the web tutorials more clear.
-            # In practice, you should use the class variables directly unless you have a good
-            # reason not to.
-            box_name = self.box_name
-            robot = self.robot
-            scene = self.scene
-            eef_link = self.eef_link
-
-            ## BEGIN_SUB_TUTORIAL attach_object
-            ##
-            ## Attaching Objects to the Robot
-            ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            ## Next, we will attach the box to the Panda wrist. Manipulating objects requires the
-            ## robot be able to touch them without the planning scene reporting the contact as a
-            ## collision. By adding link names to the ``touch_links`` array, we are telling the
-            ## planning scene to ignore collisions between those links and the box. For the Panda
-            ## robot, we set ``grasping_group = 'panda_hand'``. If you are using a different robot,
-            ## you should change this value to the name of your end effector group name.
-            grasping_group = "soft_rg6"
-            touch_links = robot.get_link_names(group=grasping_group)
-            scene.attach_box(eef_link, box_name, touch_links=touch_links)
-            ## END_SUB_TUTORIAL
-
-            # We wait for the planning scene to update.
-            return self.wait_for_state_update(
-                box_is_attached=True, box_is_known=False, timeout=timeout
-            )
-    
-    #Function source: https://github.com/moveit/moveit_tutorials/blob/master/doc/move_group_python_interface/scripts/move_group_python_interface_tutorial.py # Author: Acorn Pooley, Mike Lautman
-    def wait_for_state_update(
-        self, box_is_known=False, box_is_attached=False, timeout=4
-    ):
+    def attach_box(self):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
         # reason not to.
         box_name = self.box_name
+        robot = self.robot
         scene = self.scene
+        eef_link = self.eef_link
 
-        ## BEGIN_SUB_TUTORIAL wait_for_scene_update
+        ## BEGIN_SUB_TUTORIAL attach_object
         ##
-        ## Ensuring Collision Updates Are Received
-        ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        ## If the Python node was just created (https://github.com/ros/ros_comm/issues/176),
-        ## or dies before actually publishing the scene update message, the message
-        ## could get lost and the box will not appear. To ensure that the updates are
-        ## made, we wait until we see the changes reflected in the
-        ## ``get_attached_objects()`` and ``get_known_object_names()`` lists.
-        ## For the purpose of this tutorial, we call this function after adding,
-        ## removing, attaching or detaching an object in the planning scene. We then wait
-        ## until the updates have been made or ``timeout`` seconds have passed.
-        ## To avoid waiting for scene updates like this at all, initialize the
-        ## planning scene interface with  ``synchronous = True``.
-        start = rospy.get_time()
-        seconds = rospy.get_time()
-        while (seconds - start < timeout) and not rospy.is_shutdown():
-            # Test if the box is in attached objects
-            attached_objects = scene.get_attached_objects([box_name])
-            is_attached = len(attached_objects.keys()) > 0
-
-            # Test if the box is in the scene.
-            # Note that attaching the box will remove it from known_objects
-            is_known = box_name in scene.get_known_object_names()
-
-            # Test if we are in the expected state
-            if (box_is_attached == is_attached) and (box_is_known == is_known):
-                return True
-
-            # Sleep so that we give other threads time on the processor
-            rospy.sleep(0.1)
-            seconds = rospy.get_time()
-
-        # If we exited the while loop without returning then we timed out
-        return False
+        ## Attaching Objects to the Robot
+        ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ## Next, we will attach the box to the Panda wrist. Manipulating objects requires the
+        ## robot be able to touch them without the planning scene reporting the contact as a
+        ## collision. By adding link names to the ``touch_links`` array, we are telling the
+        ## planning scene to ignore collisions between those links and the box. For the Panda
+        ## robot, we set ``grasping_group = 'panda_hand'``. If you are using a different robot,
+        ## you should change this value to the name of your end effector group name.
+        grasping_group = "soft_rg6"
+        touch_links = robot.get_link_names(group=grasping_group)
+        scene.attach_box(eef_link, box_name, touch_links=touch_links)
         ## END_SUB_TUTORIAL
+
+        return True
+
+    def detach_and_remove_box(self):
+        box_name = self.box_name
+        scene = self.scene
+        eef_link = self.eef_link
+
+        # Detach (if attached)
+        try:
+            scene.remove_attached_object(eef_link, name=box_name)
+        except TypeError:
+            # Some MoveIt versions use positional args
+            scene.remove_attached_object(eef_link, box_name)
+
+        # Remove from world (if present)
+        scene.remove_world_object(box_name)
+        with self._lock:
+            self._is_attached = False
+
+        return True
 
 def main():
     try:
-        interface = MoveGroupPythonInterfaceTutorial()
-
-        interface.add_box()
-        interface.attach_box()
+        MoveGroupPythonInterfaceTutorial()
+        rospy.loginfo("Listening on %s (Bool) and %s (Float64)", "/group4/isSliderGrabbed", "/group4/graspOffset")
+        rospy.spin()
     except rospy.ROSInterruptException:
         return
     except KeyboardInterrupt:
         return
 
 if __name__ == "__main__":
-        main()
+    main()
 
