@@ -1,3 +1,4 @@
+
 arm_controller:
   type: position_controllers/JointTrajectoryController
   joints:
@@ -8,130 +9,66 @@ arm_controller:
     - m_robot_joint_5
     - m_robot_joint_6
     - m_robot_joint_7
-    - m_robot_linear_drive_guiderail_sledge_joint
-    - m_robot_linear_drive_sledge_dof1_joint
-    - m_robot_linear_drive_dof1_dof2_joint
   gains:
     m_robot_joint_1:
-      p: 100
-      d: 1
-      i: 1
+      p: 500
+      d: 15
+      i: 30
       i_clamp: 1
     m_robot_joint_2:
-      p: 100
-      d: 1
-      i: 1
+      p: 200
+      d: 10
+      i: 10
       i_clamp: 1
     m_robot_joint_3:
-      p: 100
-      d: 1
-      i: 1
+      p: 65
+      d: 15
+      i: 10
       i_clamp: 1
     m_robot_joint_4:
-      p: 100
-      d: 1
-      i: 1
+      p: 31
+      d: 12
+      i: 7
       i_clamp: 1
     m_robot_joint_5:
-      p: 100
-      d: 1
-      i: 1
+      p: 23
+      d: 5
+      i: 3
       i_clamp: 1
     m_robot_joint_6:
-      p: 100
-      d: 1
-      i: 1
+      p: 13
+      d: 3
+      i: 3
       i_clamp: 1
     m_robot_joint_7:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_linear_drive_guiderail_sledge_joint:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_linear_drive_sledge_dof1_joint:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_linear_drive_dof1_dof2_joint:
-      p: 100
-      d: 1
-      i: 1
+      p: 17
+      d: 2.5
+      i: 2
       i_clamp: 1
 soft_rg6_controller:
   type: position_controllers/JointTrajectoryController
   joints:
-    - Soft_RG6_joint_1_1
-    - Soft_RG6_joint_1_2
-    - Soft_RG6_joint_2_1
-    - Soft_RG6_joint_2_2
+    - rg6_joint_1_1
+    - rg6_joint_1_2
+    - rg6_joint_2_1
+    - rg6_joint_2_2
   gains:
-    Soft_RG6_joint_1_1:
+    rg6_joint_1_1:
       p: 100
       d: 1
       i: 1
       i_clamp: 1
-    Soft_RG6_joint_1_2:
+    rg6_joint_1_2:
       p: 100
       d: 1
       i: 1
       i_clamp: 1
-    Soft_RG6_joint_2_1:
+    rg6_joint_2_1:
       p: 100
       d: 1
       i: 1
       i_clamp: 1
-    Soft_RG6_joint_2_2:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-iiwa_controller:
-  type: position_controllers/JointTrajectoryController
-  joints:
-    - m_robot_joint_1
-    - m_robot_joint_2
-    - m_robot_joint_3
-    - m_robot_joint_4
-    - m_robot_joint_5
-    - m_robot_joint_6
-    - m_robot_joint_7
-  gains:
-    m_robot_joint_1:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_2:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_3:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_4:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_5:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_6:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    m_robot_joint_7:
+    rg6_joint_2_2:
       p: 100
       d: 1
       i: 1

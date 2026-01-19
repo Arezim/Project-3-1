@@ -81,7 +81,7 @@
             <material name="Grey" />
         </collision>
         <inertial>
-            <mass value="0.1" />
+            <mass value="0.001" />
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0.0" ixz="0.0" iyz="0.0" />
         </inertial>
@@ -133,7 +133,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.9670597283903604" upper="2.9670597283903604" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0" />
     </joint>
     <link name="m_robot_link_1">
         <inertial>
@@ -164,7 +164,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.0943951023931953" upper="2.0943951023931953" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0" />
     </joint>
     <link name="m_robot_link_2">
         <inertial>
@@ -195,7 +195,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.9670597283903604" upper="2.9670597283903604" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0"/>
     </joint>
     <link name="m_robot_link_3">
         <inertial>
@@ -226,7 +226,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.0943951023931953" upper="2.0943951023931953" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0" />
     </joint>
     <link name="m_robot_link_4">
         <inertial>
@@ -257,7 +257,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.9670597283903604" upper="2.9670597283903604" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0"/>
     </joint>
     <link name="m_robot_link_5">
         <inertial>
@@ -288,7 +288,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-2.0943951023931953" upper="2.0943951023931953" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0"/>
     </joint>
     <link name="m_robot_link_6">
         <inertial>
@@ -319,7 +319,7 @@
         <axis xyz="0 0 1" />
         <limit effort="300" lower="-3.0543261909900763" upper="3.0543261909900763" velocity="10" />
         <safety_controller k_position="100" k_velocity="2" soft_lower_limit="-3.01941960595019" soft_upper_limit="3.01941960595019" />
-        <dynamics damping="0.5" />
+        <dynamics damping="0.5" friction="2.0"/>
     </joint>
     <link name="m_robot_link_7">
         <inertial>
@@ -366,7 +366,7 @@
     <!-- Load Gazebo lib and set the robot namespace -->
     <gazebo>
         <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-            <robotNamespace>/iiwa</robotNamespace>
+            <robotNamespace>/</robotNamespace>
         </plugin>
     </gazebo>
     <!-- Link0 -->
@@ -418,7 +418,7 @@
         <mu2>0.2</mu2>
     </gazebo>
     <transmission name="iiwa_tran_1">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_1">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -429,7 +429,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_2">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_2">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -440,7 +440,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_3">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_3">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -451,7 +451,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_4">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_4">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -462,7 +462,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_5">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_5">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -473,7 +473,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_6">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_6">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -484,7 +484,7 @@
         </actuator>
     </transmission>
     <transmission name="iiwa_tran_7">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="m_robot_joint_7">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -663,7 +663,7 @@
         </collision>
     </link>
     <transmission name="rg6_tran_1_1">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="rg6_joint_1_1">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -674,7 +674,7 @@
         </actuator>
     </transmission>
     <transmission name="rg6_tran_1_2">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="rg6_joint_1_2">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -685,7 +685,7 @@
         </actuator>
     </transmission>
     <transmission name="rg6_tran_2_1">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="rg6_joint_2_1">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -696,7 +696,7 @@
         </actuator>
     </transmission>
     <transmission name="rg6_tran_2_2">
-        <robotNamespace>/iiwa</robotNamespace>
+        <robotNamespace>/</robotNamespace>
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="rg6_joint_2_2">
             <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
