@@ -578,7 +578,7 @@
         <origin rpy="-1.571 0 0" xyz="0 0.07 0.026" />
         <axis xyz="1 0 0" />
         <limit effort="1" lower="-0.67" upper="0.67" velocity="10" />
-        <dynamics damping="0.1" />
+        <dynamics damping="0.1" friction="1000" />
     </joint>
     <link name="rg6_finger_1">
         <inertial>
@@ -607,7 +607,8 @@
         <origin rpy="0 0 -3.14159" xyz="0.0 0.030 0.11" />
         <axis xyz="1 0 0" />
         <limit effort="1" lower="0.95" upper="2.2" velocity="10" />
-        <dynamics damping="0.1" />
+        <dynamics damping="0.1" friction="1000" />
+
     </joint>
     <link name="rg6_arm_2">
         <inertial>
