@@ -1,6 +1,25 @@
 <launch>
 	<include file="$(find group1)/launch/demo.launch" />
 	<param name="robot_description_planning/shape_transform_cache_lookup_wait_time" value="0.1"/>	
-	<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="to_robot" args="0 0 0 0 0 0 base_link camera_link" /> -->
-	<node pkg="tf2_ros" type="static_transform_publisher" name="to_camera" args="0 0 0 0 0 0 base_link world " />
+	<node pkg="tf2_ros" type="static_transform_publisher" name="to_robot" args="0 0 0 0 0 0 base_link camera_link" />
+	<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="to_camera" args="0 0 0 0 0 0 base_link world " /> -->
+	<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="to_base_link" args="0.037 -0.41 2.31 0 0 3.14159 camera_link base_link"/> -->
+	<node pkg="tf" type="static_transform_publisher" name="to_camera_depth" args="0.037 -0.41 2.31 0 0 3.14159 base_link camera_depth_optical_frame 100"/>
+
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" />
+
+<node pkg="nodelet" type="nodelet" name="crop_box" args="load pcl/CropBox pcl_manager">
+    <remap from="/camera/depth/image_rect_raw" to="/camera/depth/points" />
+    <remap from="/camera/depth/camera_info" to="/camera/depth/camera_info" />
+    <rosparam>
+      min_x: -0.5
+      max_x: 0.5
+      min_y: -0.2
+      max_y: 0.2
+      min_z: 0.0
+      max_z: 1.0
+      negative: True  </rosparam>
+  </node>
+
 </launch>

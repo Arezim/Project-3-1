@@ -356,13 +356,6 @@
         </plugin>
     </gazebo>
     <!-- The ft_sensor plugin -->
-    <gazebo>
-        <plugin filename="libgazebo_ros_ft_sensor.so" name="ft_sensor">
-            <updateRate>50.0</updateRate>
-            <topicName>/iiwa/state/CartesianWrench</topicName>
-            <jointName>m_robot_joint_7</jointName>
-        </plugin>
-    </gazebo>
     <!-- Load Gazebo lib and set the robot namespace -->
     <gazebo>
         <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
