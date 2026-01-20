@@ -135,6 +135,6 @@
     <disable_collisions link1="rg6_arm_2" link2="rg6_link_0" reason="Adjacent"/>
     <disable_collisions link1="rg6_finger_1" link2="rg6_link_0" reason="Never"/>
     <disable_collisions link1="rg6_finger_2" link2="rg6_link_0" reason="Never"/>
-    <disable_collisions link1="rg6_finger_1" link2="rg6_finger_1" reason="Adjacent"/>
-    <disable_collisions link1="rg6_finger_2" link2="rg6_finger_2" reason="Adjacent"/>
+    <disable_collisions link1="rg6_finger_1" link2="rg6_finger_1" reason="Never"/>
+    <disable_collisions link1="rg6_finger_2" link2="rg6_finger_2" reason="Never"/>
 </robot>
