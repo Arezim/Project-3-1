@@ -1,0 +1,1388 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='robot'>
+      <link name='base_link'>
+        <inertial>
+          <pose>-0 -1.12723 0.975299 0 -0 0</pose>
+          <mass>5.101</mass>
+          <inertia>
+            <ixx>0.35894</ixx>
+            <ixy>-6.05788e-18</ixy>
+            <ixz>-2.87511e-18</ixz>
+            <iyy>0.218013</iyy>
+            <iyz>-0.116719</iyz>
+            <izz>0.220928</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_fixed_joint_lump__artificial_ceiling_collision'>
+          <pose>0 0 2 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>10 10 0.001</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='base_link_fixed_joint_lump__m_robot_support_structure_collision_1'>
+          <pose>0 0 0 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/Support Structure/Low_Res_Robot_Cell_ICF.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='base_link_fixed_joint_lump__m_robot_link_0_collision_2'>
+          <pose>0 -1.05 0.885 0 -0 1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_0.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='base_link_fixed_joint_lump__m_robot_support_structure_visual'>
+          <pose>0 0 0 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/Support Structure/Low_Res_Robot_Cell_ICF.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='base_link_fixed_joint_lump__m_robot_link_0_visual_1'>
+          <pose>0 -1.05 0.885 0 -0 1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_0.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <kinematic>1</kinematic>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+      </link>
+      <joint name='m_robot_joint_1' type='revolute'>
+        <pose relative_to='base_link'>0 -1.05 1.0425 0 -0 1.5708</pose>
+        <parent>base_link</parent>
+        <child>m_robot_link_1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.96706</lower>
+            <upper>2.96706</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_1'>
+        <pose relative_to='m_robot_joint_1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 -0.03 0.12 0 -0 0</pose>
+          <mass>4</mass>
+          <inertia>
+            <ixx>0.1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.09</iyy>
+            <iyz>0</iyz>
+            <izz>0.02</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_1_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_1_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_2' type='revolute'>
+        <pose relative_to='m_robot_link_1'>0 0 0.2025 1.5708 -0 3.14159</pose>
+        <parent>m_robot_link_1</parent>
+        <child>m_robot_link_2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.0944</lower>
+            <upper>2.0944</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_2'>
+        <pose relative_to='m_robot_joint_2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.0003 0.059 0.042 0 -0 0</pose>
+          <mass>4</mass>
+          <inertia>
+            <ixx>0.05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.018</iyy>
+            <iyz>0</iyz>
+            <izz>0.044</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_2_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_2.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_2_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_2.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_3' type='revolute'>
+        <pose relative_to='m_robot_link_2'>0 0.2045 0 1.5708 -0 3.14159</pose>
+        <parent>m_robot_link_2</parent>
+        <child>m_robot_link_3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.96706</lower>
+            <upper>2.96706</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_3'>
+        <pose relative_to='m_robot_joint_3'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0.03 0.13 0 -0 0</pose>
+          <mass>3</mass>
+          <inertia>
+            <ixx>0.08</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.075</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_3_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_3.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_3_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_3.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_4' type='revolute'>
+        <pose relative_to='m_robot_link_3'>0 0 0.2155 1.5708 -0 0</pose>
+        <parent>m_robot_link_3</parent>
+        <child>m_robot_link_4</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.0944</lower>
+            <upper>2.0944</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_4'>
+        <pose relative_to='m_robot_joint_4'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0.067 0.034 0 -0 0</pose>
+          <mass>2.7</mass>
+          <inertia>
+            <ixx>0.03</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.029</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_4_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_4.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_4_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_4.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_5' type='revolute'>
+        <pose relative_to='m_robot_link_4'>0 0.1845 0 1.5708 -0 3.14159</pose>
+        <parent>m_robot_link_4</parent>
+        <child>m_robot_link_5</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.96706</lower>
+            <upper>2.96706</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_5'>
+        <pose relative_to='m_robot_joint_5'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.0001 0.021 0.076 0 -0 0</pose>
+          <mass>1.7</mass>
+          <inertia>
+            <ixx>0.02</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.018</iyy>
+            <iyz>0</iyz>
+            <izz>0.005</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_5_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_5.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_5_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_5.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_6' type='revolute'>
+        <pose relative_to='m_robot_link_5'>0 0 0.2155 1.5708 -0 0</pose>
+        <parent>m_robot_link_5</parent>
+        <child>m_robot_link_6</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.0944</lower>
+            <upper>2.0944</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='m_robot_link_6'>
+        <pose relative_to='m_robot_joint_6'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0.0006 0.0004 0 -0 0</pose>
+          <mass>1.8</mass>
+          <inertia>
+            <ixx>0.005</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0036</iyy>
+            <iyz>0</iyz>
+            <izz>0.0047</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_6_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_6.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='m_robot_link_6_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_6.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Orange</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='m_robot_joint_7' type='revolute'>
+        <pose relative_to='m_robot_link_6'>0 0.081 0 1.5708 -0 3.14159</pose>
+        <parent>m_robot_link_6</parent>
+        <child>m_robot_link_7</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.05433</lower>
+            <upper>3.05433</upper>
+            <effort>300</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.5</damping>
+            <friction>2</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <provide_feedback>1</provide_feedback>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+        </physics>
+        <plugin name='gazebo_ros_control'>
+          <robotNamespace>/</robotNamespace>
+        </plugin>
+      </joint>
+      <link name='m_robot_link_7'>
+        <pose relative_to='m_robot_joint_7'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.022766 -0.000495 0.036389 0 -0 0</pose>
+          <mass>0.501</mass>
+          <inertia>
+            <ixx>0.0322244</ixx>
+            <ixy>-1.17529e-05</ixy>
+            <ixz>0.000390521</ixz>
+            <iyy>0.0412502</iyy>
+            <iyz>8.56468e-06</iyz>
+            <izz>0.0340311</izz>
+          </inertia>
+        </inertial>
+        <collision name='m_robot_link_7_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/collision/link_7.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='m_robot_link_7_fixed_joint_lump__camera_mount_body_collision_1'>
+          <pose>-0.146 0.008 0.031 0 -0 1.571</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/other/zed2i_mount.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='m_robot_link_7_fixed_joint_lump__rg6_link_0_collision_2'>
+          <pose>2e-06 -0.00097 0.051 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_body.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='m_robot_link_7_fixed_joint_lump__zed2i_camera_center_collision_3'>
+          <pose>-0.112998 -0.00199 0.070997 3.14159 -1.57079 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/zed2i/zed2i.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='m_robot_link_7_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/iiwa14/visual/link_7.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://group1/kinect/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <visual name='m_robot_link_7_fixed_joint_lump__camera_mount_body_visual_1'>
+          <pose>-0.146 0.008 0.031 0 -0 1.571</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/other/zed2i_mount.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='m_robot_link_7_fixed_joint_lump__rg6_link_0_visual_2'>
+          <pose>2e-06 -0.00097 0.051 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_body.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='m_robot_link_7_fixed_joint_lump__zed2i_camera_center_visual_3'>
+          <pose>-0.112996 -0.00199 0.060997 3.14159 -1.57079 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/zed2i/zed2i.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='rg6_joint_1_1' type='revolute'>
+        <pose relative_to='m_robot_link_7'>2e-06 -0.02897 0.161 0 -0 0</pose>
+        <parent>m_robot_link_7</parent>
+        <child>rg6_arm_1</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>0.95</lower>
+            <upper>2.2</upper>
+            <effort>1</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='rg6_arm_1'>
+        <pose relative_to='rg6_joint_1_1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='rg6_arm_1_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_arm.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='rg6_arm_1_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_arm.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='rg6_joint_1_2' type='revolute'>
+        <pose relative_to='rg6_arm_1'>0 0.07 0.026 -1.571 0 0</pose>
+        <parent>rg6_arm_1</parent>
+        <child>rg6_finger_1</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-0.67</lower>
+            <upper>0.67</upper>
+            <effort>1</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='rg6_finger_1'>
+        <pose relative_to='rg6_joint_1_2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='rg6_finger_1_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='rg6_finger_1_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_finger.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='rg6_joint_2_1' type='revolute'>
+        <pose relative_to='m_robot_link_7'>2e-06 0.02903 0.161 0 0 -3.14159</pose>
+        <parent>m_robot_link_7</parent>
+        <child>rg6_arm_2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>0.95</lower>
+            <upper>2.2</upper>
+            <effort>1</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='rg6_arm_2'>
+        <pose relative_to='rg6_joint_2_1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='rg6_arm_2_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_arm.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='rg6_arm_2_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_arm.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='rg6_joint_2_2' type='revolute'>
+        <pose relative_to='rg6_arm_2'>0 0.07 0.026 -1.571 0 0</pose>
+        <parent>rg6_arm_2</parent>
+        <child>rg6_finger_2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-0.67</lower>
+            <upper>0.67</upper>
+            <effort>1</effort>
+            <velocity>10</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='rg6_finger_2'>
+        <pose relative_to='rg6_joint_2_2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='rg6_finger_2_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='rg6_finger_2_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.4 0.4 0.4</scale>
+              <uri>/root/test/ws_moveit/src/iiwa_description/meshes/rg6/rg6_finger.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+        <robotNamespace>/</robotNamespace>
+      </plugin>
+      <frame name='artificial_ceiling_to_base' attached_to='base_link'>
+        <pose>0 0 2 0 -0 0</pose>
+      </frame>
+      <frame name='artificial_ceiling' attached_to='artificial_ceiling_to_base'/>
+      <frame name='m_robot_support_structure_m_robot_joint' attached_to='m_robot_support_structure'>
+        <pose>0 -1.05 0.885 0 -0 1.5708</pose>
+      </frame>
+      <frame name='m_robot_link_0' attached_to='m_robot_support_structure_m_robot_joint'/>
+      <frame name='camera_mount_body_rg6_joint' attached_to='camera_mount_body'>
+        <pose>-0.009 -0.146 0.02 0 0 -1.571</pose>
+      </frame>
+      <frame name='rg6_link_0' attached_to='camera_mount_body_rg6_joint'/>
+      <frame name='zed2i_baro_joint' attached_to='zed2i_camera_center'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_baro_link' attached_to='zed2i_baro_joint'/>
+      <frame name='zed2i_left_camera_optical_joint' attached_to='zed2i_left_camera_frame'>
+        <pose>-0.01 0 0 -1.5708 -0 -1.5708</pose>
+      </frame>
+      <frame name='zed2i_left_camera_optical_frame' attached_to='zed2i_left_camera_optical_joint'/>
+      <frame name='zed2i_temp_left_joint' attached_to='zed2i_left_camera_frame'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_temp_left_link' attached_to='zed2i_temp_left_joint'/>
+      <frame name='zed2i_left_camera_joint' attached_to='zed2i_camera_center'>
+        <pose>0 0.06 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_left_camera_frame' attached_to='zed2i_left_camera_joint'/>
+      <frame name='zed2i_mag_joint' attached_to='zed2i_camera_center'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_mag_link' attached_to='zed2i_mag_joint'/>
+      <frame name='zed2i_right_camera_optical_joint' attached_to='zed2i_right_camera_frame'>
+        <pose>-0.01 0 0 -1.5708 -0 -1.5708</pose>
+      </frame>
+      <frame name='zed2i_right_camera_optical_frame' attached_to='zed2i_right_camera_optical_joint'/>
+      <frame name='zed2i_temp_right_joint' attached_to='zed2i_right_camera_frame'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_temp_right_link' attached_to='zed2i_temp_right_joint'/>
+      <frame name='zed2i_right_camera_joint' attached_to='zed2i_camera_center'>
+        <pose>0 -0.06 0 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_right_camera_frame' attached_to='zed2i_right_camera_joint'/>
+      <frame name='zed2i_camera_center_joint' attached_to='zed2i_base_link'>
+        <pose>0 0 0.015 0 -0 0</pose>
+      </frame>
+      <frame name='zed2i_camera_center' attached_to='zed2i_camera_center_joint'/>
+      <frame name='zed2i_base_joint' attached_to='camera_mount_body'>
+        <pose>-0.01 -0.048 0.04 3.14159 -1.57059 1.57059</pose>
+      </frame>
+      <frame name='zed2i_base_link' attached_to='zed2i_base_joint'/>
+      <frame name='m_robot_link_ee_to_body_joint' attached_to='m_robot_link_ee'>
+        <pose>-0.146 0.008 -0.014 0 -0 1.571</pose>
+      </frame>
+      <frame name='camera_mount_body' attached_to='m_robot_link_ee_to_body_joint'/>
+      <frame name='m_robot_joint_ee' attached_to='m_robot_link_7'>
+        <pose>0 0 0.045 0 -0 0</pose>
+      </frame>
+      <frame name='m_robot_link_ee' attached_to='m_robot_joint_ee'/>
+      <frame name='base_link_m_robot_joint1' attached_to='base_link'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='m_robot_support_structure' attached_to='base_link_m_robot_joint1'/>
+      <pose>0 0 0 0 -0 0</pose>
+    </model>
+    <model name='kinect'>
+      <static>1</static>
+      <pose>2.0509 -0.712247 0.036 0 -0 0</pose>
+      <link name='link'>
+        <inertial>
+          <mass>0.1</mass>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.073 0.276 0.072</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://kinect/meshes/kinect.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <sensor name='camera' type='depth'>
+          <update_rate>20</update_rate>
+          <camera>
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>3</far>
+            </clip>
+          </camera>
+          <plugin name='camera_plugin' filename='libgazebo_ros_openni_kinect.so'>
+            <baseline>0.2</baseline>
+            <alwaysOn>1</alwaysOn>
+            <updateRate>0.0</updateRate>
+            <cameraName>camera_ir</cameraName>
+            <imageTopicName>/camera/color/image_raw</imageTopicName>
+            <cameraInfoTopicName>/camera/color/camera_info</cameraInfoTopicName>
+            <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+            <depthImageCameraInfoTopicName>/camera/depth/camera_info</depthImageCameraInfoTopicName>
+            <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
+            <frameName>camera_link</frameName>
+            <pointCloudCutoff>0.5</pointCloudCutoff>
+            <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+            <distortionK1>0</distortionK1>
+            <distortionK2>0</distortionK2>
+            <distortionK3>0</distortionK3>
+            <distortionT1>0</distortionT1>
+            <distortionT2>0</distortionT2>
+            <CxPrime>0</CxPrime>
+            <Cx>0</Cx>
+            <Cy>0</Cy>
+            <focalLength>0</focalLength>
+            <hackBaseline>0</hackBaseline>
+          </plugin>
+        </sensor>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <state world_name='default'>
+      <sim_time>71 839000000</sim_time>
+      <real_time>73 38438420</real_time>
+      <wall_time>1768922840 38207247</wall_time>
+      <iterations>71839</iterations>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='kinect'>
+        <pose>0.11407 -0.738444 1.90768 -1.572595 1.572595 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0.11407 -0.738444 1.90768 -1.572595 1.572595 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='robot'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 -1.92119 0 5.2e-05 9.6e-05</acceleration>
+          <wrench>0 0 -9.8 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_1'>
+          <pose>-0 -1.05 1.0425 0 -2e-06 1.5708</pose>
+          <velocity>-0 -0 0 0 -0 3e-05</velocity>
+          <acceleration>9.7e-05 8e-06 -2.2e-05 0.000187 -0.000247 -0.000261</acceleration>
+          <wrench>0.000389 3.2e-05 -8.7e-05 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_2'>
+          <pose>0 -1.05 1.245 1.5708 0 -1.5708</pose>
+          <velocity>-0 0 -0 -0.000486 0 3e-05</velocity>
+          <acceleration>0.00022 -0.000119 4.6e-05 -0.000737 2.5e-05 -0.008006</acceleration>
+          <wrench>0.000878 -0.000477 0.000183 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_3'>
+          <pose>-1e-06 -1.05 1.4495 1e-06 5e-06 1.5708</pose>
+          <velocity>-0 9.9e-05 -0 -0.000486 -1e-06 0.00027</velocity>
+          <acceleration>0.000587 -0.000294 9.9e-05 0.000432 0.001313 0.000964</acceleration>
+          <wrench>0.00176 -0.000883 0.000298 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_4'>
+          <pose>-0 -1.05 1.665 1.57683 1.57001 1.57683</pose>
+          <velocity>-1e-06 0.000204 0 -0.000749 -1e-06 0.00027</velocity>
+          <acceleration>0.000479 -0.000195 -0.000249 0.000187 0.000472 0.00268</acceleration>
+          <wrench>0.001292 -0.000526 -0.000671 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_5'>
+          <pose>-1e-06 -0.865496 1.66514 1.48398 -1.56177 -3.05477</pose>
+          <velocity>-5e-05 0.000204 -0.000138 -0.000749 -0.00049 0.00027</velocity>
+          <acceleration>-0.000187 -0.000223 -0.000613 0.002256 -0.120589 0.000656</acceleration>
+          <wrench>-0.000318 -0.00038 -0.001043 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_6'>
+          <pose>-3e-06 -0.649996 1.66531 -1.5798 -0.001578 1.57082</pose>
+          <velocity>-0.000109 0.000204 -0.000299 -0.001492 -0.000493 0.000263</velocity>
+          <acceleration>-0.000762 -0.000325 -0.000643 -0.005337 0.007041 0.005726</acceleration>
+          <wrench>-0.001371 -0.000585 -0.001157 0 -0 0</wrench>
+        </link>
+        <link name='m_robot_link_7'>
+          <pose>0.000726 -0.649868 1.58431 -3.13259 0.001575 -1.57078</pose>
+          <velocity>-6.9e-05 8.4e-05 -0.000299 -0.001492 -0.000497 0.000251</velocity>
+          <acceleration>-0.00262 -0.000282 -0.000654 0.001179 0.027048 0.003876</acceleration>
+          <wrench>-0.001312 -0.000141 -0.000328 0 -0 0</wrench>
+        </link>
+        <link name='rg6_arm_1'>
+          <pose>0.031145 -0.649617 1.42358 -2.18259 0.001574 -1.57078</pose>
+          <velocity>1.1e-05 -0.000148 -0.000284 -0.001492 -0.000577 0.000251</velocity>
+          <acceleration>-0.005805 8.9e-05 -0.0014 0.00188 0.023274 0.004111</acceleration>
+          <wrench>-5.8e-05 1e-06 -1.4e-05 0 -0 0</wrench>
+        </link>
+        <link name='rg6_arm_2'>
+          <pose>-0.026853 -0.649617 1.42306 -2.2006 -0.001575 1.57081</pose>
+          <velocity>1.2e-05 -0.000164 -0.000313 -0.001492 -0.00052 0.000251</velocity>
+          <acceleration>-0.005307 -0.000207 -6.8e-05 0.001573 0.02167 0.00416</acceleration>
+          <wrench>-5.3e-05 -2e-06 -1e-06 0 -0 0</wrench>
+        </link>
+        <link name='rg6_finger_1'>
+          <pose>0.012225 -0.649503 1.35135 1.8596 0.001574 -1.57078</pose>
+          <velocity>5.3e-05 -0.000261 -0.000295 -0.001492 -0.000558 0.000251</velocity>
+          <acceleration>-0.007137 0.000103 -0.000973 0.001763 0.022696 0.004128</acceleration>
+          <wrench>-7.1e-05 1e-06 -1e-05 0 -0 0</wrench>
+        </link>
+        <link name='rg6_finger_2'>
+          <pose>-0.006636 -0.649503 1.35118 1.84159 -0.001574 1.57081</pose>
+          <velocity>4.9e-05 -0.000266 -0.000303 -0.001492 -0.000582 0.000251</velocity>
+          <acceleration>-0.007609 7.3e-05 -0.000524 0.001998 0.02383 0.00412</acceleration>
+          <wrench>-7.6e-05 1e-06 -5e-06 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-3.34788 6.55871 3.12689 0 0.291643 -1.18296</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>
