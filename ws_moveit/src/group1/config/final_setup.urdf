@@ -719,7 +719,7 @@
             <material name="zed2i_mat" />
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="-0.01 0 0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
             <geometry>
                 <mesh filename="package://iiwa_description/meshes/zed2i/zed2i.stl" />
             </geometry>
