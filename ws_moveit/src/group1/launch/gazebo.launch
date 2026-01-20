@@ -32,8 +32,6 @@
   
   <!-- Given the published joint states, publish tf for the robot links -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="-0.1142 -0.742 2.14 0 0 3.14159 camera_link base_link" />
-
 
     <!-- Launch MoveIt -->
   <include file="$(dirname)/demo.launch" pass_all_args="true">

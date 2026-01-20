@@ -23,6 +23,9 @@
   <arg name="use_gui" default="false" />
   <arg name="use_rviz" default="true" />
 
+  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="-0.1142 -0.742 2.14 0 0 3.14159 camera_link base_link" />
+
+
   <!-- If needed, broadcast static tf for robot root -->
   <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 world base_link" /> -->
 
@@ -69,5 +72,4 @@
   <include file="$(dirname)/default_warehouse_db.launch" if="$(arg db)">
     <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
   </include>
-
 </launch>
