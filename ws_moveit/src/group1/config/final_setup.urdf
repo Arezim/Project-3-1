@@ -355,6 +355,9 @@
             <robotNamespace>/</robotNamespace>
         </plugin>
     </gazebo>
+    <gazebo reference="m_robot_support_structure">
+        <kinematic>true</kinematic>
+    </gazebo>
     <!-- The ft_sensor plugin -->
     <!-- Load Gazebo lib and set the robot namespace -->
     <gazebo>
