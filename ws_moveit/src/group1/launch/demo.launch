@@ -45,8 +45,6 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
     <!-- <node pkg="group1" name="parallel_benchmark" type="parallel_benchmark.py" output="screen" respawn="true"/> -->
     <!-- <node pkg="group1" name="group1_subscribers" type="group1_subscribers.py" output="screen" respawn="true"/> -->
-</node>
-
   </group>
 
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
