@@ -1,8 +1,0 @@
-prefix=/home/serhat/Project-3-1/ws_moveit/devel/.private/group1
-
-Name: group1
-Description: Description of group1
-Version: 0.3.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
