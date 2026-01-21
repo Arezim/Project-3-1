@@ -1,5 +1,0 @@
-catkin_simple
-/root/test/ws_moveit/devel/.private/catkin_simple/lib/pkgconfig/catkin_simple.pc /root/test/ws_moveit/devel/lib/pkgconfig/catkin_simple.pc
-/root/test/ws_moveit/devel/.private/catkin_simple/share/catkin_simple/cmake/catkin_simple-extras.cmake /root/test/ws_moveit/devel/share/catkin_simple/cmake/catkin_simple-extras.cmake
-/root/test/ws_moveit/devel/.private/catkin_simple/share/catkin_simple/cmake/catkin_simpleConfig-version.cmake /root/test/ws_moveit/devel/share/catkin_simple/cmake/catkin_simpleConfig-version.cmake
-/root/test/ws_moveit/devel/.private/catkin_simple/share/catkin_simple/cmake/catkin_simpleConfig.cmake /root/test/ws_moveit/devel/share/catkin_simple/cmake/catkin_simpleConfig.cmake

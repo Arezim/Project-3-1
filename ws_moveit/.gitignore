@@ -2,3 +2,6 @@
 build/
 devel/
 logs/
+
+# Ignore catkin tools and roslaunch generated files
+.catkin_tools/
