@@ -1,1 +1,0 @@
-/root/test/ws_moveit/devel/.private/smart_man_moveit_config_test/share/smart_man_moveit_config_test/cmake/smart_man_moveit_config_testConfig-version.cmake
