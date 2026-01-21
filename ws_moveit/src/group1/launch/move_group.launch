@@ -78,10 +78,10 @@
     <arg name="fake_execution_type" value="$(arg fake_execution_type)" />
   </include>
 
-  <!-- Sensors Functionality -->
+  <!-- Sensors Functionality
   <include ns="move_group" file="$(dirname)/sensor_manager.launch.xml" if="$(arg allow_trajectory_execution)">
     <arg name="moveit_sensor_manager" value="m_robot" />
-  </include>
+  </include> -->
 
   <!-- <param name="/move_group/planning_pipelines/ompl/constraint_approximations_path" value="$(find group1)/config/constraints_database"/> -->
   <!-- Start the actual move_group node/action server -->
