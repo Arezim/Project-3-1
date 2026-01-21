@@ -1,4 +1,0 @@
-iiwa_control
-/root/test/ws_moveit/devel/.private/iiwa_control/lib/pkgconfig/iiwa_control.pc /root/test/ws_moveit/devel/lib/pkgconfig/iiwa_control.pc
-/root/test/ws_moveit/devel/.private/iiwa_control/share/iiwa_control/cmake/iiwa_controlConfig-version.cmake /root/test/ws_moveit/devel/share/iiwa_control/cmake/iiwa_controlConfig-version.cmake
-/root/test/ws_moveit/devel/.private/iiwa_control/share/iiwa_control/cmake/iiwa_controlConfig.cmake /root/test/ws_moveit/devel/share/iiwa_control/cmake/iiwa_controlConfig.cmake

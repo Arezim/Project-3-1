@@ -1,4 +1,4 @@
-prefix=/root/test/ws_moveit/devel/.private/m_robot_moveit_config
+prefix=/home/serhat/Project-3-1/ws_moveit/devel/.private/m_robot_moveit_config
 
 Name: m_robot_moveit_config
 Description: Description of m_robot_moveit_config

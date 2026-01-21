@@ -18,7 +18,7 @@ if not type -q bass
 end
 
 if test -z $_CATKIN_SETUP_DIR
-    set _CATKIN_SETUP_DIR /root/test/ws_moveit/devel/.private/m_robot_moveit_config
+    set _CATKIN_SETUP_DIR /home/serhat/Project-3-1/ws_moveit/devel/.private/m_robot_moveit_config
 end
 
 set _SETUP_UTIL "$_CATKIN_SETUP_DIR/_setup_util.py"

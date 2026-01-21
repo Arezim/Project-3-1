@@ -1,1 +1,0 @@
-/root/test/ws_moveit/devel/.private/iiwa_control/lib/pkgconfig/iiwa_control.pc

@@ -1,8 +1,0 @@
-prefix=/root/test/ws_moveit/devel/.private/ply_publisher
-
-Name: ply_publisher
-Description: Description of ply_publisher
-Version: 0.1.0
-Cflags: -I/root/test/ws_moveit/src/ply_publisher/include
-Libs: -L${prefix}/lib 
-Requires: sensor_msgs

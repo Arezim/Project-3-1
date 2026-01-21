@@ -1,2 +1,2 @@
 - setup-file:
-    local-name: /root/test/ws_moveit/devel/.private/group1/setup.sh
+    local-name: /home/serhat/Project-3-1/ws_moveit/devel/.private/group1/setup.sh

@@ -1,4 +1,4 @@
-prefix=/root/ws_moveit/devel/.private/catkin_tools_prebuild
+prefix=/home/serhat/Project-3-1/ws_moveit/devel/.private/catkin_tools_prebuild
 
 Name: catkin_tools_prebuild
 Description: Description of catkin_tools_prebuild

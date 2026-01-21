@@ -23,6 +23,7 @@ from shape_msgs.msg import SolidPrimitive
 from moveit_msgs.msg import (
     CollisionObject, RobotTrajectory, DisplayTrajectory
 )
+from iiwa_msgs.msg import MoveAlongJointSplineActionResult
 
 # CONFIGURATION
 PLANNERS: Dict[str, str] = {
@@ -79,6 +80,38 @@ OBSTACLES = [
         "position": [0.45, 0.15, 0.8],
     },
 ]
+
+
+class KukaExecutionWatcher:
+    """Watches KUKA iiwa action server results to verify execution success."""
+    
+    def __init__(self):
+        self.last_success = True
+        self.received = False
+        
+        rospy.Subscriber(
+            "/iiwa/action/move_along_joint_spline/result",
+            MoveAlongJointSplineActionResult,
+            self._callback
+        )
+    
+    def _callback(self, msg):
+        # SUCCESS = status 3 in ActionLib
+        self.last_success = (msg.status.status == 3 and msg.result.success)
+        self.received = True
+    
+    def wait_for_success(self, timeout: float = 30.0) -> bool:
+        """Block until execution result received or timeout."""
+        self.received = False
+        start = rospy.get_time()
+        while not rospy.is_shutdown():
+            if self.received:
+                return self.last_success
+            if rospy.get_time() - start > timeout:
+                rospy.logwarn("KukaExecutionWatcher: timeout waiting for result")
+                return False
+            rospy.sleep(0.05)
+        return False
 
 
 def joint_path_length(points: List) -> float:
@@ -291,6 +324,10 @@ def main():
     current_joints = group.get_current_joint_values()
     print(f"[benchmark] Current joint values: {[f'{j:.3f}' for j in current_joints]}")
     
+    # Initialize execution watcher for KUKA robot
+    watcher = KukaExecutionWatcher()
+    print("[benchmark] KukaExecutionWatcher initialized")
+    
     # Try to get known planner IDs
     try:
         known_planners = group.get_known_planner_ids()
@@ -427,7 +464,17 @@ def main():
                 # Execute the trajectory
                 print(f"  Executing trajectory...")
                 group.set_start_state_to_current_state()
-                group.execute(best_res["trajectory"], wait=True)
+                exec_ok = group.execute(best_res["trajectory"], wait=True)
+                
+                # Wait for KUKA action server confirmation
+                if exec_ok:
+                    if watcher.wait_for_success(timeout=30.0):
+                        print(f"  ✓ Execution verified by KUKA action server")
+                    else:
+                        print(f"  ⚠ Execution returned OK but KUKA action server reported failure")
+                else:
+                    print(f"  ✗ MoveIt execute() returned False")
+                
                 group.stop()
                 print(f"  Execution complete.")
                 rospy.sleep(1.0)  # Wait for robot to settle
@@ -445,21 +492,26 @@ def main():
                     group.set_pose_target(to_wp["pose"])
                 
                 success = group.go(wait=True)
-                group.stop()
                 
+                # Verify with KUKA action server
                 if success:
-                    print(f"  Fallback execution successful.")
+                    if watcher.wait_for_success(timeout=30.0):
+                        print(f"  ✓ Fallback execution verified by KUKA action server")
+                    else:
+                        print(f"  ⚠ Fallback returned OK but KUKA action server reported failure")
                 else:
-                    print(f"  Fallback also failed! Skipping this motion.")
+                    print(f"  ✗ Fallback also failed! Skipping this motion.")
+                
+                group.stop()
                 
                 rospy.sleep(1.0)
         
         print(f"\n>>> Run {run} complete!")
     
-    # Cleanup
-    if USE_OBSTACLES:
-        remove_obstacles(scene)
-        print("  Obstacles removed.")
+    # # Cleanup
+    # if USE_OBSTACLES:
+    #     remove_obstacles(scene)
+    #     print("  Obstacles removed.")
     
     print("\n[benchmark] Benchmark complete!")
     roscpp_shutdown()

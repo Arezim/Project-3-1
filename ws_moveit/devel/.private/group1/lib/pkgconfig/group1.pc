@@ -1,4 +1,4 @@
-prefix=/root/test/ws_moveit/devel/.private/group1
+prefix=/home/serhat/Project-3-1/ws_moveit/devel/.private/group1
 
 Name: group1
 Description: Description of group1
