@@ -2,3 +2,7 @@
 /motion-planning-1/ws/.catkin_tools
 /motion-planning-1/ws/build
 /ws_moveit/devel
+/ws_moveit/.catkin_tools
+/ws_moveit/.catkin_tools
+/ws_moveit/devel
+/ws_moveit/logs

@@ -1,8 +1,1 @@
-prefix=/home/nishan/Project-3-1/ws_moveit/devel
-
-Name: iiwa_description
-Description: Description of iiwa_description
-Version: 1.4.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
+/root/test/Project-3-1/ws_moveit/devel/.private/iiwa_description/lib/pkgconfig/iiwa_description.pc
