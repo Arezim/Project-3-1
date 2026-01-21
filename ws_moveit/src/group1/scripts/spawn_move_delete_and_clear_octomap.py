@@ -23,13 +23,13 @@ BALL_SDF_TEMPLATE = """<?xml version="1.0" ?>
 
       <collision name="collision">
         <geometry>
-          <sphere><radius>0.20</radius></sphere>
+          <sphere><radius>0.15</radius></sphere>
         </geometry>
       </collision>
 
       <visual name="visual">
         <geometry>
-          <sphere><radius>0.20</radius></sphere>
+          <sphere><radius>0.10</radius></sphere>
         </geometry>
         <material>
           <ambient>1 0 0 1</ambient>
@@ -60,11 +60,11 @@ def main():
     model_name = rospy.get_param("~model_name", "moving_ball")
     reference_frame = rospy.get_param("~reference_frame", "world")
 
-    spawn_xyz = rospy.get_param("~spawn_xyz", [-0.371791, 0.191214, 1.229632])   # start position
-    robot_xyz = rospy.get_param("~robot_xyz", [-0.909682, -1.335030, 0.873373])   # where to move toward
+    spawn_xyz = rospy.get_param("~spawn_xyz", [-0.311791, 0.191214, 1.229632])   # start position
+    robot_xyz = rospy.get_param("~robot_xyz", [-0.31682, -1.335030, 0.873373])   # where to move toward
     robot_model_name = rospy.get_param("~robot_model_name", "")  # optional Gazebo model name
-    speed_mps = float(rospy.get_param("~speed_mps", 0.15))        # movement speed
-    lifetime_s = float(rospy.get_param("~lifetime_s", 10.0))      # delete after this
+    speed_mps = float(rospy.get_param("~speed_mps", 0.10))        # movement speed
+    lifetime_s = float(rospy.get_param("~lifetime_s", 15.0))      # delete after this
 
     octomap_clear_period_s = float(rospy.get_param("~octomap_clear_period_s", 2.0))
 

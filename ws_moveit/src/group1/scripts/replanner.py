@@ -9,7 +9,7 @@ import moveit_commander
 from geometry_msgs.msg import PoseStamped
 from moveit_msgs.msg import RobotTrajectory
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from iiwa_msgs.msg import MoveAlongJointSplineActionResult
+#from iiwa_msgs.msg import MoveAlongJointSplineActionResult
 import moveit_msgs.msg
 
 
@@ -96,29 +96,29 @@ def wait_for_param(name, timeout=30.0):
             return False
         time.sleep(0.1)
 
-class KukaExecutionWatcher:
-    def __init__(self):
-        self.last_success = True
-        self.received = True
+# class KukaExecutionWatcher:
+#     def __init__(self):
+#         self.last_success = True
+#         self.received = True
 
-        rospy.Subscriber("/iiwa/action/move_along_joint_spline/result",MoveAlongJointSplineActionResult,self.callback)
+#         rospy.Subscriber("/iiwa/action/move_along_joint_spline/result",MoveAlongJointSplineActionResult,self.callback)
 
-    def callback(self, msg):
-        # SUCCESS = status 3
-        self.last_success = (msg.status.status == 3 and msg.result.success)
-        self.received = True
+#     def callback(self, msg):
+#         # SUCCESS = status 3
+#         self.last_success = (msg.status.status == 3 and msg.result.success)
+#         self.received = True
 
-    def wait_for_success(self, timeout=30):
-        t0 = time.time()
-        self.received = False
-        while not rospy.is_shutdown():
-            if self.received:
-                print("returning success")
-                return self.last_success
-            if time.time() - t0 > timeout:
-                print("returning false")
-                return False
-            rospy.sleep(0.05)
+#     def wait_for_success(self, timeout=30):
+#         t0 = time.time()
+#         self.received = False
+#         while not rospy.is_shutdown():
+#             if self.received:
+#                 print("returning success")
+#                 return self.last_success
+#             if time.time() - t0 > timeout:
+#                 print("returning false")
+#                 return False
+#             rospy.sleep(0.05)
 
 
 def main():
@@ -169,7 +169,7 @@ def main():
 
     rate = rospy.Rate(2.0)  # prevents bus y-loop when planning fails
     target_index = 0
-    watcher = KukaExecutionWatcher()
+   # watcher = KukaExecutionWatcher()
     first_movement = True
 
 
@@ -241,9 +241,9 @@ def main():
         )
 
         exec_ok = group.execute(sliced_traj, wait=True)
-        if (watcher.wait_for_success(timeout=10) == True):
-            print("succes")
-        # rospy.sleep(0.5)
+        # if (watcher.wait_for_success(timeout=10) == True):
+        #     print("succes")
+        # # rospy.sleep(0.5)
         if not exec_ok:
             rospy.logwarn("replanner: execute(slice) returned False, will replan next loop")
             rate.sleep()
