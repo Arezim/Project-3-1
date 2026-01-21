@@ -1,2 +1,0 @@
-- setup-file:
-    local-name: /root/test/motion-planning-1/ws/devel/.private/moveit_tutorials/setup.sh

@@ -1,6 +1,0 @@
-devel_space: /root/test/motion-planning-1/ws/devel
-install: false
-install_space: /root/test/motion-planning-1/ws/install
-profile: default
-source_space: /root/test/motion-planning-1/ws/src
-workspace: /root/test/motion-planning-1/ws

@@ -1,4 +1,0 @@
-geometry_msgs/PoseStamped target
----
-bool success
-sensor_msgs/JointState joint_states

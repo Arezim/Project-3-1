@@ -1,1 +1,0 @@
-/root/test/motion-planning-1/ws/devel/.private/moveit_tutorials/lib/moveit_tutorials/collision_scene_example.py

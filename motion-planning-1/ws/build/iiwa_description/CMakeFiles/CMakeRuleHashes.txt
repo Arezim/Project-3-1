@@ -1,2 +1,0 @@
-# Hashes of file build rules.
-6a885302296ec5abc45fae8e15e9d252 CMakeFiles/clean_test_results

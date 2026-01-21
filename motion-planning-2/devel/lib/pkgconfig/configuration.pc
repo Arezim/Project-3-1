@@ -1,8 +1,0 @@
-prefix=/home/tom/ws_urdf/devel
-
-Name: configuration
-Description: Description of configuration
-Version: 0.3.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
