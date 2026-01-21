@@ -193,12 +193,10 @@ class DynamicObstacleManager:
         rospy.loginfo("[DYNAMIC] Starting dynamic obstacle loop...")
         
         while self.is_running and not rospy.is_shutdown():
-            # APPEAR phase
             visible_duration = random.uniform(DYNAMIC_VISIBLE_MIN, DYNAMIC_VISIBLE_MAX)
             rospy.loginfo(f"[DYNAMIC] Obstacle APPEARING for {visible_duration:.1f}s")
             self._add_dynamic_obstacle()
-            
-            # Wait while visible
+
             sleep_start = time.time()
             while (time.time() - sleep_start) < visible_duration and self.is_running:
                 time.sleep(0.1)
@@ -244,9 +242,6 @@ class DynamicObstacleManager:
         rospy.loginfo("[DYNAMIC] Dynamic obstacle manager stopped")
 
 
-# =========================
-# HELPER FUNCTIONS
-# =========================
 def joint_path_length(points: List) -> float:
     """Calculate the total joint-space path length."""
     if len(points) < 2:
@@ -311,9 +306,6 @@ def remove_obstacles(scene: PlanningSceneInterface, obstacles: List[Dict]):
     rospy.sleep(0.3)
 
 
-# =========================
-# PLANNER CLASS
-# =========================
 class PlannerBenchmark:
     def __init__(self, group_name: str, planning_time: float, num_attempts: int, headless: bool = False):
         rospy.loginfo("Initializing PlannerBenchmark...")
@@ -551,9 +543,9 @@ class PlannerBenchmark:
         Execute a planned trajectory.
         Returns True if executed, False if skipped due to collision.
         """
-        # CRITICAL: Re-validate trajectory before execution (for dynamic obstacles)
+
         if not self.is_trajectory_valid(trajectory):
-            rospy.logwarn("⚠️  Trajectory is now INVALID (obstacle appeared). Skipping execution!")
+            rospy.logwarn(" Trajectory is now INVALID (obstacle appeared). Skipping execution!")
             return False
         
         if self.headless:
@@ -585,9 +577,6 @@ class PlannerBenchmark:
         roscpp_shutdown()
 
 
-# =========================
-# CSV LOGGING
-# =========================
 def write_csv_header(csv_path: str):
     """Write CSV header."""
     with open(csv_path, "w", newline="") as f:
@@ -638,9 +627,6 @@ def append_csv_row(csv_path: str, row_data: Dict):
         )
 
 
-# =========================
-# MAIN BENCHMARK
-# =========================
 def main():
     args = parse_arguments()
     
@@ -680,7 +666,6 @@ def main():
         rospy.loginfo(f"ENVIRONMENT: {env_name.upper()}")
         rospy.loginfo(f"{'='*60}")
 
-        # Handle dynamic obstacles
         dynamic_manager = None
         if env_name == "dynamic_obstacles":
             rospy.loginfo("Starting dynamic obstacle manager...")
@@ -689,7 +674,7 @@ def main():
                 benchmark.group.get_planning_frame()
             )
             dynamic_manager.start()
-            rospy.sleep(2.0)  # Give it time to start
+            rospy.sleep(2.0)
         elif obstacles:
             add_obstacles(benchmark.scene, obstacles, benchmark.group.get_planning_frame())
 
@@ -703,7 +688,6 @@ def main():
             benchmark.group.stop()
             rospy.sleep(1.0)
 
-            # Execute test path
             for motion_idx in range(len(test_path) - 1):
                 from_name, _ = test_path[motion_idx]
                 to_name, to_joints = test_path[motion_idx + 1]
@@ -712,7 +696,6 @@ def main():
 
                 results = benchmark.benchmark_motion(from_name, to_name, to_joints)
 
-                # Execute best trajectory
                 successful = [r for r in results if r["success"]]
                 execution_skipped = False
                 
@@ -738,7 +721,6 @@ def main():
                     benchmark.group.go(wait=True)
                     benchmark.group.stop()
 
-                # Log to CSV
                 for result in results:
                     append_csv_row(
                         csv_path,
@@ -761,7 +743,7 @@ def main():
                         },
                     )
 
-        # Cleanup
+        # cleanup
         if dynamic_manager:
             dynamic_manager.stop()
         elif obstacles:

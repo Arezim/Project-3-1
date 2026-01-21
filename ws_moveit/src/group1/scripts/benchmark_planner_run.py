@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
+
 """
-SILENT Planner Benchmark - Optimized for Speed
-
-Minimal terminal output for production runs.
-Only prints: environment+run progress and final results location.
-
 Usage:
   rosrun group1 benchmark_planner_run.py
 """
@@ -35,9 +31,6 @@ from moveit_msgs.msg import CollisionObject, RobotTrajectory
 from moveit_msgs.srv import GetStateValidity, GetStateValidityRequest
 
 
-# =========================
-# CONFIGURATION
-# =========================
 @dataclass(frozen=True)
 class PlannerSpec:
     planner_id: str
@@ -58,7 +51,6 @@ PLANNING_TIME = 10.0
 NUM_ATTEMPTS = 3
 RESULTS_DIR = os.path.expanduser("~/benchmarks")
 
-# Robot positions
 HELL_YEAH_JOINTS = [0.0, 0.0, 0.0, -1.5708, 0.0, 1.5708, 0.0]
 
 WAYPOINTS = {
@@ -70,7 +62,6 @@ WAYPOINTS = {
     },
 }
 
-# Obstacle definitions
 STATIC_OBSTACLES = [
     {
         "name": "static_box_1",
@@ -92,16 +83,12 @@ DYNAMIC_OBSTACLES = [
     },
 ]
 
-# Dynamic obstacle timing
 DYNAMIC_VISIBLE_MIN = 3.0
 DYNAMIC_VISIBLE_MAX = 7.0
 DYNAMIC_HIDDEN_MIN = 2.0
 DYNAMIC_HIDDEN_MAX = 5.0
 
 
-# =========================
-# SILENT LOGGING
-# =========================
 def suppress_ros_logging():
     """Suppress ROS logging to terminal."""
     import logging
@@ -109,9 +96,6 @@ def suppress_ros_logging():
     rospy.set_param('/move_group/trajectory_execution/execution_duration_monitoring', False)
 
 
-# =========================
-# DYNAMIC OBSTACLE MANAGER
-# =========================
 class DynamicObstacleManager:
     def __init__(self, scene: PlanningSceneInterface, frame_id: str):
         self.scene = scene
@@ -194,9 +178,6 @@ class DynamicObstacleManager:
         self._remove_dynamic_obstacle()
 
 
-# =========================
-# HELPER FUNCTIONS
-# =========================
 def joint_path_length(points: List) -> float:
     if len(points) < 2:
         return 0.0
@@ -256,9 +237,6 @@ def remove_obstacles(scene: PlanningSceneInterface, obstacles: List[Dict]):
     rospy.sleep(0.3)
 
 
-# =========================
-# PLANNER CLASS
-# =========================
 class PlannerBenchmark:
     def __init__(self, group_name: str, planning_time: float, num_attempts: int):
         suppress_ros_logging()
@@ -455,9 +433,6 @@ class PlannerBenchmark:
         roscpp_shutdown()
 
 
-# =========================
-# CSV LOGGING
-# =========================
 def write_csv_header(csv_path: str):
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
@@ -506,9 +481,6 @@ def append_csv_row(csv_path: str, row_data: Dict):
         )
 
 
-# =========================
-# MAIN BENCHMARK
-# =========================
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
     timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -516,7 +488,6 @@ def main():
 
     write_csv_header(csv_path)
     
-    # ONLY essential startup info
     print(f"\n{'='*60}")
     print(f"SILENT BENCHMARK MODE")
     print(f"{'='*60}")
@@ -526,7 +497,6 @@ def main():
 
     benchmark = PlannerBenchmark("arm", PLANNING_TIME, NUM_ATTEMPTS)
 
-    # Define test path
     test_path = [
         ("hell_yeah", HELL_YEAH_JOINTS),
         ("Position_A", WAYPOINTS["Position_A"]["joints"]),
@@ -536,7 +506,6 @@ def main():
         ("Position_A", WAYPOINTS["Position_A"]["joints"]),
     ]
 
-    # Environment scenarios
     environments = [
         ("no_obstacles", "No Obstacles", []),
         ("static_obstacles", "Static Obstacles", STATIC_OBSTACLES),
@@ -546,7 +515,6 @@ def main():
     start_time = time.time()
 
     for env_idx, (env_name, env_display, obstacles) in enumerate(environments, 1):
-        # Handle dynamic obstacles
         dynamic_manager = None
         if env_name == "dynamic_obstacles":
             dynamic_manager = DynamicObstacleManager(
@@ -559,20 +527,17 @@ def main():
             add_obstacles(benchmark.scene, obstacles, benchmark.group.get_planning_frame())
 
         for run in range(1, RUNS_PER_SCENARIO + 1):
-            # Reset to start position
             benchmark.group.set_joint_value_target(HELL_YEAH_JOINTS)
             benchmark.group.go(wait=True)
             benchmark.group.stop()
             rospy.sleep(0.5)
 
-            # Execute test path
             for motion_idx in range(len(test_path) - 1):
                 from_name, _ = test_path[motion_idx]
                 to_name, to_joints = test_path[motion_idx + 1]
 
                 results = benchmark.benchmark_motion(from_name, to_name, to_joints)
 
-                # Execute best trajectory
                 successful = [r for r in results if r["success"]]
                 execution_skipped = False
                 
@@ -589,7 +554,7 @@ def main():
                     benchmark.group.go(wait=True)
                     benchmark.group.stop()
 
-                # Log to CSV
+
                 for result in results:
                     append_csv_row(
                         csv_path,
@@ -612,11 +577,10 @@ def main():
                         },
                     )
 
-            # ONLY print completion of each run
             elapsed = time.time() - start_time
             print(f"[Env {env_idx}/3: {env_display}] Run {run}/{RUNS_PER_SCENARIO} complete ({elapsed/60:.1f} min elapsed)")
 
-        # Cleanup
+        # cleanup
         if dynamic_manager:
             dynamic_manager.stop()
         elif obstacles:
