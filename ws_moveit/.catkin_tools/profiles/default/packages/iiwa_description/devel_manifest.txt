@@ -1,4 +1,0 @@
-iiwa_description
-/home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/.private/iiwa_description/share/iiwa_description/cmake/iiwa_descriptionConfig.cmake /home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/share/iiwa_description/cmake/iiwa_descriptionConfig.cmake
-/home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/.private/iiwa_description/share/iiwa_description/cmake/iiwa_descriptionConfig-version.cmake /home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/share/iiwa_description/cmake/iiwa_descriptionConfig-version.cmake
-/home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/.private/iiwa_description/lib/pkgconfig/iiwa_description.pc /home/serhat/Desktop/about_project/Project-3-1/ws_moveit/devel/lib/pkgconfig/iiwa_description.pc
