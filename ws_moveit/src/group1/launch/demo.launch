@@ -39,7 +39,11 @@
     </node>
 
     <!-- Given the published joint states, publish tf for the robot links -->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
+    <!-- added this to ignore timestamp age -->
+  <param name="ignore_timestamp" value="true"/>
+</node>
+
   </group>
 
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
@@ -59,9 +63,9 @@
     <arg name="debug" value="$(arg debug)"/>
   </include>
 
-    <include ns="move_group" file="$(dirname)/sensor_manager.launch.xml">
+    <!-- <include ns="move_group" file="$(dirname)/sensor_manager.launch.xml">
   	<arg name="moveit_sensor_manager" value="m_robot" />
-  </include>
+  </include> -->
 
   <!-- If database loading was enabled, start mongodb as well -->
   <include file="$(dirname)/default_warehouse_db.launch" if="$(arg db)">
