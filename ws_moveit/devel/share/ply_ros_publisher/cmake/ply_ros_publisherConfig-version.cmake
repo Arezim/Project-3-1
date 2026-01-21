@@ -1,1 +1,0 @@
-/root/test/ws_moveit/devel/.private/ply_ros_publisher/share/ply_ros_publisher/cmake/ply_ros_publisherConfig-version.cmake

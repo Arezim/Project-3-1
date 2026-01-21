@@ -1,2 +1,0 @@
-- setup-file:
-    local-name: /root/test/ws_moveit/devel/.private/catkin_simple/setup.sh

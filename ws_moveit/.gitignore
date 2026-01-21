@@ -1,0 +1,4 @@
+# Ignore catkin build files
+build/
+devel/
+logs/
