@@ -126,6 +126,7 @@ def main():
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.sleep(0.4)
     rospy.init_node("replanner", anonymous=False)
+    ratunek = 0
 
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=20)
     planning_scene_diff_publisher = rospy.Publisher("planning_scene", moveit_msgs.msg.PlanningScene, queue_size=1)
@@ -158,7 +159,7 @@ def main():
 
     targets = [
         ("A", make_pose(A["x"], A["y"], A["z"], frame=frame_id)),
-        # ("B", make_pose(B["x"], B["y"], B["z"], frame=frame_id)),
+        ("B", make_pose(B["x"], B["y"], B["z"], frame=frame_id)),
     ]
 
     rospy.loginfo("replanner: using group '%s' in frame '%s'", "arm", frame_id)
@@ -174,6 +175,16 @@ def main():
 
 
     while not rospy.is_shutdown():
+        if ratunek = 0:
+            targets = [
+            ("A", make_pose(A["x"], A["y"], A["z"], frame=frame_id)),
+            ("B", make_pose(B["x"], B["y"], B["z"], frame=frame_id))]
+            ratunek = 1
+        else:
+            ratunek = 0
+            targets = [
+            ("B", make_pose(B["x"], B["y"], B["z"], frame=frame_id)),
+            ("A", make_pose(A["x"], A["y"], A["z"], frame=frame_id))]
         label, goal_pose = targets[target_index]
 
         robot_state = robot.get_current_state()
